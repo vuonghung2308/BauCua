@@ -37,6 +37,7 @@ public class ConnectionPool {
 
     public static ConnectionPool getInstance() {
         if (datasource == null) {
+            System.out.println(DatabaseConfig.CONNECTION_URL);
             datasource = new ConnectionPool();
             return datasource;
         } else {

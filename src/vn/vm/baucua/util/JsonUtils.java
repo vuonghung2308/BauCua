@@ -8,7 +8,9 @@ public class JsonUtils {
         return new Gson().toJson(object);
     }
 
-    public static <T extends Object> T fromJson(String json, Class<T> classOfT) {
+    public static <T extends Object> T fromJson(
+            String json, Class<T> classOfT
+    ) {
         return new Gson().fromJson(json, classOfT);
     }
 }
