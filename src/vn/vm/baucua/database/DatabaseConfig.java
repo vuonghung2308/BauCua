@@ -12,5 +12,5 @@ public class DatabaseConfig {
     public static final int DB_MIN_CONNECTIONS = 2;
     public static final int DB_MAX_CONNECTIONS = 5;
     public static final String CONNECTION_URL = "jdbc:mysql://"
-            + LOCAL_HOST + ":" + DB_PORT + "/" + DB_NAME;
+            + HOST_NAME + ":" + DB_PORT + "/" + DB_NAME;
 }

@@ -19,9 +19,11 @@ public class ConnectionPool {
         }
         
         BoneCPConfig config = new BoneCPConfig();
+        
         config.setJdbcUrl(DatabaseConfig.CONNECTION_URL);
         config.setUsername(DatabaseConfig.USER_NAME);
         config.setPassword(DatabaseConfig.PASSWORD);
+        
         config.setMinConnectionsPerPartition(DatabaseConfig.DB_MIN_CONNECTIONS);
         config.setMaxConnectionsPerPartition(DatabaseConfig.DB_MAX_CONNECTIONS);
         config.setPartitionCount(1);

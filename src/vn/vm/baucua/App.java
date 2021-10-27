@@ -14,8 +14,12 @@ public class App {
         connectDatabase();
         Logger.getRootLogger().setLevel(Level.OFF);
         ServerSocket server = new ServerSocket(1111);
+
+        System.out.println("Start listen on ip: "
+                + server.getInetAddress() + ", port: "
+                + server.getLocalPort()
+        );
         
-        System.out.println("Start listen on ip: " + server.getInetAddress() + ", port: " + server.getLocalPort());
         while (true) {
             Socket socket = server.accept();
             new ThreadSocket(socket).start();
