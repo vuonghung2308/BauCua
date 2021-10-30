@@ -1,39 +1,56 @@
 package vn.vm.baucua.socket;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import vn.vm.baucua.socket.pool.RoomPool;
+import vn.vm.baucua.socket.pool.ClientPool;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
+import java.util.List;
 import vn.vm.baucua.data.entity.Player;
+import vn.vm.baucua.data.entity.RoomInfo;
+import vn.vm.baucua.data.request.DataGoRoomRequest;
 import vn.vm.baucua.data.request.DataLoginRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.data.response.DataError;
 import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.database.dao.PlayerDao;
 import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.Log;
 
 public class ThreadSocket extends Thread {
 
-    private final Socket socket;
-    private Client client;
-    private InputStream is;
-    private OutputStream os;
-    private DataInputStream dis;
-    private DataOutputStream dos;
+    private final Client client;
+    private ClientPool clientPool;
+    private RoomPool roomPool;
+    private Room room;
 
     public ThreadSocket(Socket socket) {
-        this.socket = socket;
+        client = new Client(socket);
+    }
+
+    private void stopThreadSocket() throws IOException {
+        if (client != null && client.getId() != -1) {
+            Integer clientId = client.getId();
+            clientPool.removeClient(clientId);
+            if (room != null) {
+                room.remove(client.getId());
+                updateRoomMemberToOther();
+                room = null;
+            }
+        }
+        client.closeSocket();
+    }
+
+    private void initThreadSocket() throws IOException {
+        clientPool = ClientPool.getInstance();
+        roomPool = RoomPool.getInstance();
+        client.initSocket();
     }
 
     @Override
     public void run() {
         try {
-            initSocket();
-
-            String jsonRequest = dis.readUTF();
-            Request request = new Request(jsonRequest);
+            initThreadSocket();
+            Request request = client.receive();
 
             if (request.isLoginRequest()) {
                 boolean isCorrectInfo = handleLoginRequest(request);
@@ -41,35 +58,20 @@ public class ThreadSocket extends Thread {
                     while (true) {
                         boolean disconnect = !handleOtherRequest();
                         if (disconnect) {
-                            closeSocket();
+                            stopThreadSocket();
                             break;
                         }
                     }
+                } else {
+                    stopThreadSocket();
                 }
             } else if (request.isSignUpRequest()) {
                 // handle signup here
             }
 
         } catch (IOException ex) {
-            System.out.println(ex);
+            Log.e(ex);
         }
-    }
-
-    private void closeSocket() throws IOException {
-        ClientPool.removeClient(client.getId());
-        dos.close();
-        dis.close();
-        is.close();
-        os.close();
-        socket.close();
-    }
-
-    private void initSocket() throws IOException {
-        client = new Client(socket);
-        is = socket.getInputStream();
-        os = socket.getOutputStream();
-        dis = new DataInputStream(is);
-        dos = new DataOutputStream(os);
     }
 
     private boolean handleLoginRequest(Request request) throws IOException {
@@ -82,35 +84,107 @@ public class ThreadSocket extends Thread {
         response.content = request.content;
 
         if (player != null) {
-            String jsonPlayer = JsonUtils.toJson(player);
-            response.data = jsonPlayer;;
+            Client c = clientPool.getClient(player.id);
+            if (c != null) {
+                sendError(
+                        request.content, 2001,
+                        "account is logged in on another device"
+                );
+                return false;
+            }
             client.setPlayer(player);
-            ClientPool.addClient(client);
-            String responseJson = JsonUtils.toJson(response);
-            dos.writeUTF(responseJson);
-            dos.flush();
+            clientPool.addClient(client);
+            response.setData(player);
+            client.send(response);
+            sendRoomInfos();
             return true;
         } else {
-            DataError error = new DataError();
-            error.message = "wrong username or password";
-            String jsonError = JsonUtils.toJson(error);
-            response.data = jsonError;
-            String responseJson = JsonUtils.toJson(response);
-            dos.writeUTF(responseJson);
-            dos.flush();
-            socket.close();
+            sendError(
+                    request.content, 2000,
+                    "wrong username or password"
+            );
             return false;
         }
     }
 
     private boolean handleOtherRequest() {
         try {
-            String string = dis.readUTF();
-            //handle other request here
+            Request request = client.receive();
+            if (request == null) {
+                return true;
+            }
+            switch (request.content) {
+                case "go-room": {
+                    handleGoRoom(request);
+                    break;
+                }
+                case "list-room": {
+                    sendRoomInfos();
+                    break;
+                }
+                case "out-room": {
+                    outRoom(request);
+                    break;
+                }
+            }
             return true;
         } catch (IOException e) {
             return false;
         }
     }
 
+    private void handleGoRoom(Request request) throws IOException {
+        DataGoRoomRequest data = (DataGoRoomRequest) request.getDataObject();
+        Response response = new Response(request.content);
+        if (room != null) {
+            sendError(request.content, 3002, "you are in a room");
+            return;
+        }
+        if (Room.count >= data.roomId) {
+            room = roomPool.goRoom(data.roomId, client);
+            if (room != null) {
+                response.setData(room.getPlayes());
+                updateRoomMemberToOther();
+                client.send(response);
+            } else {
+                sendError(request.content, 3000, "room full");
+            }
+        } else {
+            sendError(request.content, 3001, "room not exists");
+        }
+    }
+
+    private void updateRoomMemberToOther() throws IOException {
+        Response playersResponse = new Response(
+                "room-member", room.getPlayes()
+        );
+        room.sendToAll(playersResponse, client.getId());
+    }
+
+    private void sendRoomInfos() throws IOException {
+        Response res = new Response(
+                "list-room", roomPool.getRoomInfos()
+        );
+        client.send(res);
+    }
+
+    private void outRoom(Request request) throws IOException {
+        if (room != null) {
+            room.remove(client.getId());
+            updateRoomMemberToOther();
+            Response response = new Response(
+                    request.content, roomPool.getRoomInfos()
+            );
+            client.send(response);
+            room = null;
+        } else {
+            sendError(request.content, 4000, "you are not in any room");
+        }
+    }
+
+    private void sendError(String content, int code, String msg) throws IOException {
+        DataError error = new DataError(code, msg);
+        Response response = new Response(content, error);
+        client.send(response);
+    }
 }

@@ -19,9 +19,15 @@ public class Request {
     public Object getDataObject() {
         switch (content) {
             case "login":
-                return JsonUtils.fromJson(data, DataLoginRequest.class);
+                return dataFromJson(DataLoginRequest.class);
+            case "go-room":
+                return dataFromJson(DataGoRoomRequest.class);
         }
         return null;
+    }
+
+    public <T> Object dataFromJson(Class<T> aClass) {
+        return JsonUtils.fromJson(data, aClass);
     }
 
     public boolean isLoginRequest() {

@@ -7,6 +7,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.socket.ThreadSocket;
+import vn.vm.baucua.util.Log;
 
 public class App {
 
@@ -21,10 +22,10 @@ public class App {
         Logger.getRootLogger().setLevel(Level.OFF);
         ServerSocket server = new ServerSocket(1111);
 
-        System.out.println("Start listen on address: "
+        String message = "Start listen on address: "
                 + server.getInetAddress().getHostAddress()
-                + ", port: " + server.getLocalPort()
-        );
+                + ", port: " + server.getLocalPort();
+        Log.d("App", message);
 
         while (true) {
             Socket socket = server.accept();
@@ -35,7 +36,7 @@ public class App {
     private static void connectToDatabase() {
         Thread connectThread = new Thread(() -> {
             ConnectionPool.getInstance();
-            System.out.println("Connected to database.");
+            Log.d("App", "Connected to database.");
         });
         connectThread.start();
     }

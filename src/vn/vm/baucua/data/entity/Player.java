@@ -2,10 +2,10 @@ package vn.vm.baucua.data.entity;
 
 public class Player {
 
-    private Integer id;
-    private String username;
-    private String fullname;
-    private Long balance;
+    public int id;
+    public String username;
+    public String fullname;
+    public Long balance;
 
     public Player(
             Integer id, String username,

@@ -37,7 +37,6 @@ public class ConnectionPool {
 
     public static ConnectionPool getInstance() {
         if (datasource == null) {
-            System.out.println(DatabaseConfig.CONNECTION_URL);
             datasource = new ConnectionPool();
             return datasource;
         } else {
@@ -49,7 +48,7 @@ public class ConnectionPool {
         try {
             return boneCP.getConnection();
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.err.println(e.getMessage());;
             return null;
         }
     }
