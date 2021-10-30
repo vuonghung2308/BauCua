@@ -4,16 +4,13 @@ import vn.vm.baucua.socket.pool.RoomPool;
 import vn.vm.baucua.socket.pool.ClientPool;
 import java.io.IOException;
 import java.net.Socket;
-import java.util.List;
 import vn.vm.baucua.data.entity.Player;
-import vn.vm.baucua.data.entity.RoomInfo;
 import vn.vm.baucua.data.request.DataGoRoomRequest;
 import vn.vm.baucua.data.request.DataLoginRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.data.response.DataError;
 import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.database.dao.PlayerDao;
-import vn.vm.baucua.util.JsonUtils;
 import vn.vm.baucua.util.Log;
 
 public class ThreadSocket extends Thread {
@@ -75,7 +72,8 @@ public class ThreadSocket extends Thread {
     }
 
     private boolean handleLoginRequest(Request request) throws IOException {
-        DataLoginRequest data = (DataLoginRequest) request.getDataObject();
+        Object object = request.getDataObject();
+        DataLoginRequest data = (DataLoginRequest) object;
 
         PlayerDao playerDao = new PlayerDao();
         Player player = playerDao.getPlayer(data.username, data.password);
@@ -134,10 +132,13 @@ public class ThreadSocket extends Thread {
     }
 
     private void handleGoRoom(Request request) throws IOException {
-        DataGoRoomRequest data = (DataGoRoomRequest) request.getDataObject();
+        Object object = request.getDataObject();
+        DataGoRoomRequest data = (DataGoRoomRequest) object;
         Response response = new Response(request.content);
         if (room != null) {
-            sendError(request.content, 3002, "you are in a room");
+            sendError(request.content, 3002,
+                    "you are in a room"
+            );
             return;
         }
         if (Room.count >= data.roomId) {
@@ -147,10 +148,14 @@ public class ThreadSocket extends Thread {
                 updateRoomMemberToOther();
                 client.send(response);
             } else {
-                sendError(request.content, 3000, "room full");
+                sendError(request.content,
+                        3000, "room full"
+                );
             }
         } else {
-            sendError(request.content, 3001, "room not exists");
+            sendError(request.content, 3001,
+                    "room not exists"
+            );
         }
     }
 
@@ -178,7 +183,9 @@ public class ThreadSocket extends Thread {
             client.send(response);
             room = null;
         } else {
-            sendError(request.content, 4000, "you are not in any room");
+            sendError(request.content, 4000,
+                    "you are not in any room"
+            );
         }
     }
 

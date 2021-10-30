@@ -11,7 +11,7 @@ public class PlayerDao extends Dao<Player> {
 
     public Player getPlayer(String username, String password) {
         try {
-            String query = "select * from player where username = ? and `password` = ? ";
+            String query = "select * from player where `username` = ? and `password` = sha2(?, 224) ";
             ConnectionPool pool = ConnectionPool.getInstance();
             Connection connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
