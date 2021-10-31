@@ -6,7 +6,7 @@ public class Response {
 
     public String content;
     public String data;
-    public String code;
+    public int code;
 
     public Response() {
     }
@@ -23,7 +23,7 @@ public class Response {
     public Response(String content, Object data, int code) {
         this.data = JsonUtils.toJson(data);
         this.content = content;
-        this.code = code+"";
+        this.code = code;
     }
 
     public void setData(Object data) {
