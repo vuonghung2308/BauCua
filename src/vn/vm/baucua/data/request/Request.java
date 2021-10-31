@@ -1,5 +1,6 @@
 package vn.vm.baucua.data.request;
 
+import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.util.JsonUtils;
 
 public class Request {
@@ -22,6 +23,10 @@ public class Request {
                 return dataFromJson(DataLoginRequest.class);
             case "go-room":
                 return dataFromJson(DataGoRoomRequest.class);
+            case "register":
+                return dataFromJson(DataRegisterRequest.class);
+            case "chat":
+                return dataFromJson(ChatMessage.class);
         }
         return null;
     }
@@ -35,6 +40,6 @@ public class Request {
     }
 
     public boolean isSignUpRequest() {
-        return content.equals("signup");
+        return content.equals("register");
     }
 }

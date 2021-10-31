@@ -9,13 +9,14 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import vn.vm.baucua.data.request.DataGoRoomRequest;
 import vn.vm.baucua.data.request.DataLoginRequest;
+import vn.vm.baucua.data.request.DataRegisterRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.util.JsonUtils;
 
 public class TestClient {
 
     public static void main(String[] args) throws IOException {
-        boolean serverTest = true;
+        boolean serverTest = false;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;
@@ -30,14 +31,15 @@ public class TestClient {
             DataOutputStream dos = new DataOutputStream(os);
             DataInputStream dis = new DataInputStream(is);
             System.out.println("Connected to ip: " + host + ", port: " + port);
-
-            if (!testLogin(dos, dis, username, password)) {
-                return;
-            }
-            testListRoom(dos, dis);
-            testGoRoom(dos, dis);
+//
+//            if (!testLogin(dos, dis, username, password)) {
+//                return;
+//            }
+//            testListRoom(dos, dis);
+//            testGoRoom(dos, dis);
 //            testGoRoom(dos, dis);
 //            testOutRoom(dos, dis);
+              testRegister(dos, dis);
 
             while (true) {
                 byte[] bytes = new byte[2048];
@@ -161,6 +163,36 @@ public class TestClient {
         long stopTime = System.currentTimeMillis();
         long elapsedTime = stopTime - startTime;
         System.out.println("Time call: " + elapsedTime + " ms");
+    }
+    private static void testRegister(
+            DataOutputStream dos,
+            DataInputStream dis
+    ) throws IOException {
+        System.out.println("client start register"); 
+       long startTime = System.currentTimeMillis();
+        Request request = new Request();
+        request.content = "register";
+        DataRegisterRequest data = new DataRegisterRequest();
+        data.fullName = "thanh";
+        data.username = "12345";
+        data.password = "111";
+        request.data = JsonUtils.toJson(data);
+        String jsonReq = JsonUtils.toJson(request);
+
+        dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
+        System.out.println("send thanh công");
+        byte[] bytes = new byte[2048];
+        int byteRec = dis.read(bytes);
+        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
+        System.out.println("------------------------------------------------");
+
+        System.out.println("Request: " + jsonReq);
+        System.out.println("Response: " + jsonRes);
+
+        long stopTime = System.currentTimeMillis();
+        long elapsedTime = stopTime - startTime;
+        System.out.println("Time call: " + elapsedTime + " ms");
+
     }
 
 }

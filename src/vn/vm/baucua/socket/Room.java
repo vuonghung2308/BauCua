@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vn.vm.baucua.data.entity.Player;
 import vn.vm.baucua.data.entity.RoomInfo;
 import vn.vm.baucua.data.response.Response;
@@ -38,9 +40,7 @@ public class Room {
         this.name = name;
     }
 
-    public void sendToAll(
-            Response response, int ignore
-    ) throws IOException {
+    public void sendToAll(Response response, int ignore) throws IOException {
         for (Client client : clients.values()) {
             if (client.getId() != ignore) {
                 client.send(response);
@@ -48,7 +48,7 @@ public class Room {
         }
     }
 
-    public void sendToAll(
+    public void sendToAll( // send result baucua
             Response response
     ) throws IOException {
         for (Client client : clients.values()) {
@@ -84,5 +84,14 @@ public class Room {
 
     public int numberClient() {
         return clients.size();
+    }
+    
+    public void sendOneClient(int id, Response response){
+        try {
+            Client clientReceive = clients.get(id);
+            clientReceive.send(response);
+        } catch (IOException ex) {
+            Logger.getLogger(Room.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

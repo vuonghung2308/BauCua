@@ -4,13 +4,24 @@ import vn.vm.baucua.socket.pool.RoomPool;
 import vn.vm.baucua.socket.pool.ClientPool;
 import java.io.IOException;
 import java.net.Socket;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.entity.Player;
+import vn.vm.baucua.data.entity.RoomInfo;
 import vn.vm.baucua.data.request.DataGoRoomRequest;
 import vn.vm.baucua.data.request.DataLoginRequest;
+import vn.vm.baucua.data.request.DataRegisterRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.data.response.DataError;
 import vn.vm.baucua.data.response.Response;
+import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.database.dao.PlayerDao;
+import vn.vm.baucua.util.JsonUtils;
 import vn.vm.baucua.util.Log;
 
 public class ThreadSocket extends Thread {
@@ -18,7 +29,7 @@ public class ThreadSocket extends Thread {
     private final Client client;
     private ClientPool clientPool;
     private RoomPool roomPool;
-    private Room room;
+    private Room room; // room.send
 
     public ThreadSocket(Socket socket) {
         client = new Client(socket);
@@ -48,7 +59,8 @@ public class ThreadSocket extends Thread {
         try {
             initThreadSocket();
             Request request = client.receive();
-
+            System.out.println("SERVER START");
+            System.out.println(request.content);
             if (request.isLoginRequest()) {
                 boolean isCorrectInfo = handleLoginRequest(request);
                 if (isCorrectInfo) {
@@ -63,7 +75,7 @@ public class ThreadSocket extends Thread {
                     stopThreadSocket();
                 }
             } else if (request.isSignUpRequest()) {
-                // handle signup here
+                register(request);
             }
 
         } catch (IOException ex) {
@@ -72,8 +84,7 @@ public class ThreadSocket extends Thread {
     }
 
     private boolean handleLoginRequest(Request request) throws IOException {
-        Object object = request.getDataObject();
-        DataLoginRequest data = (DataLoginRequest) object;
+        DataLoginRequest data = (DataLoginRequest) request.getDataObject();
 
         PlayerDao playerDao = new PlayerDao();
         Player player = playerDao.getPlayer(data.username, data.password);
@@ -124,6 +135,12 @@ public class ThreadSocket extends Thread {
                     outRoom(request);
                     break;
                 }
+                case "chat": { // chat private
+                    chat(request);
+                }
+                case "chat-all": {
+                    chatAll(request);
+                }
             }
             return true;
         } catch (IOException e) {
@@ -132,13 +149,10 @@ public class ThreadSocket extends Thread {
     }
 
     private void handleGoRoom(Request request) throws IOException {
-        Object object = request.getDataObject();
-        DataGoRoomRequest data = (DataGoRoomRequest) object;
+        DataGoRoomRequest data = (DataGoRoomRequest) request.getDataObject();
         Response response = new Response(request.content);
         if (room != null) {
-            sendError(request.content, 3002,
-                    "you are in a room"
-            );
+            sendError(request.content, 3002, "you are in a room");
             return;
         }
         if (Room.count >= data.roomId) {
@@ -148,14 +162,10 @@ public class ThreadSocket extends Thread {
                 updateRoomMemberToOther();
                 client.send(response);
             } else {
-                sendError(request.content,
-                        3000, "room full"
-                );
+                sendError(request.content, 3000, "room full");
             }
         } else {
-            sendError(request.content, 3001,
-                    "room not exists"
-            );
+            sendError(request.content, 3001, "room not exists");
         }
     }
 
@@ -183,9 +193,7 @@ public class ThreadSocket extends Thread {
             client.send(response);
             room = null;
         } else {
-            sendError(request.content, 4000,
-                    "you are not in any room"
-            );
+            sendError(request.content, 4000, "you are not in any room");
         }
     }
 
@@ -193,5 +201,36 @@ public class ThreadSocket extends Thread {
         DataError error = new DataError(code, msg);
         Response response = new Response(content, error);
         client.send(response);
+    }
+    
+    private void register(Request request) {
+        try {
+            System.out.println("client register");
+            DataRegisterRequest register = (DataRegisterRequest) request.getDataObject();
+            String username = register.username;
+            String password = register.password;
+            String fullName = register.fullName;
+            PlayerDao playerDao = new PlayerDao();
+            Response response;
+            if(playerDao.insertPlayer(username, password, fullName)){
+                response = new Response("register", username, 200);
+            }
+            else{
+                response = new Response("register", username, 4000);
+            }
+            client.send(response);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    private void chat(Request request) { // chat private
+        ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
+        ChatMessage chatMessageSend = new ChatMessage(client.getPlayer().id, chatMessageReceive.message);
+        Response response = new Response("chat", chatMessageSend, 200);
+        room.sendOneClient(chatMessageReceive.id, response);
+    }
+
+    private void chatAll(Request request) {// chat all
     }
 }
