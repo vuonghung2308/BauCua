@@ -231,6 +231,14 @@ public class ThreadSocket extends Thread {
         room.sendOneClient(chatMessageReceive.id, response);
     }
 
-    private void chatAll(Request request) {// chat all
+    private void chatAll(Request request) // chat all
+        {try {
+            ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
+            ChatMessage chatMessageSend = new ChatMessage(client.getPlayer().id, chatMessageReceive.message);
+            Response response = new Response("chat", chatMessageSend, 200);
+            room.sendToAll(response, this.client.getId());
+        } catch (IOException ex) {
+            Logger.getLogger(ThreadSocket.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }
