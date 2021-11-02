@@ -213,10 +213,10 @@ public class ThreadSocket extends Thread {
             PlayerDao playerDao = new PlayerDao();
             Response response;
             if(playerDao.insertPlayer(username, password, fullName)){
-                response = new Response("register", username, 200);
+                response = new Response("register", "Đăng kí thành công", 200);
             }
             else{
-                response = new Response("register", username, 4000);
+                response = new Response("register", "Đăng kí sai do tên username đã được đăng kí trước đó.", 4000);
             }
             client.send(response);
         } catch (IOException ex) {
@@ -235,7 +235,7 @@ public class ThreadSocket extends Thread {
         {try {
             ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
             ChatMessage chatMessageSend = new ChatMessage(client.getPlayer().id, chatMessageReceive.message);
-            Response response = new Response("chat", chatMessageSend, 200);
+            Response response = new Response("chat-all", chatMessageSend, 200);
             room.sendToAll(response, this.client.getId());
         } catch (IOException ex) {
             Logger.getLogger(ThreadSocket.class.getName()).log(Level.SEVERE, null, ex);
