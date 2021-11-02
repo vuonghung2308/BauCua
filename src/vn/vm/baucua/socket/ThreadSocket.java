@@ -234,6 +234,7 @@ public class ThreadSocket extends Thread {
     private void chatAll(Request request) // chat all
         {try {
             ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
+                    System.out.println(chatMessageReceive.message);
             ChatMessage chatMessageSend = new ChatMessage(client.getPlayer().id, chatMessageReceive.message);
             Response response = new Response("chat-all", chatMessageSend, 200);
             room.sendToAll(response, this.client.getId());

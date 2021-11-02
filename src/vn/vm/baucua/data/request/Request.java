@@ -27,6 +27,8 @@ public class Request {
                 return dataFromJson(DataRegisterRequest.class);
             case "chat":
                 return dataFromJson(ChatMessage.class);
+            case "chat-all":
+                return dataFromJson(ChatMessage.class);
         }
         return null;
     }

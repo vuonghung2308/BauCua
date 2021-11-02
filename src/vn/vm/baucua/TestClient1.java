@@ -9,14 +9,13 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.request.DataGoRoomRequest;
 import vn.vm.baucua.data.request.DataLoginRequest;
 import vn.vm.baucua.data.request.DataRegisterRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.util.JsonUtils;
 
-public class TestClient {
+public class TestClient1 {
 
     public static void main(String[] args) throws IOException {
         boolean serverTest = false;
@@ -25,7 +24,7 @@ public class TestClient {
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "ductoan";
+        String username = "thanhngo";
         String password = username + "@1234";
 
         try (Socket socket = new Socket(host, port)) {
@@ -41,7 +40,7 @@ public class TestClient {
             
 //            testListRoom(dos, dis);
             testGoRoom(dos, dis);
-            testChat(dos, dis, "hiii");
+//            testChat(dos, dis, "hiii");
 //            testGoRoom(dos, dis);
 //            testOutRoom(dos, dis);
 //              testRegister(dos, dis);
@@ -204,12 +203,11 @@ public class TestClient {
         try {
             Request request = new Request();
             request.content = "chat-all";
-            ChatMessage chat = new ChatMessage(0, hiii);
-            request.data = JsonUtils.toJson(chat);
+            request.data = hiii;
             String jsonReq = JsonUtils.toJson(request);
             dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
         } catch (IOException ex) {
-            Logger.getLogger(TestClient.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestClient1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
