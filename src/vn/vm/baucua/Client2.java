@@ -17,7 +17,7 @@ import vn.vm.baucua.util.JsonUtils;
 public class Client2 {
 
     public static void main(String[] args) throws IOException {
-        boolean serverTest = false;
+        boolean serverTest = true;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;

@@ -31,11 +31,11 @@ public class ThreadSocket extends Thread {
     private void stopThreadSocket() throws IOException {
         if (client != null && client.getId() != -1) {
             Integer clientId = client.getId();
-            clientPool.removeClient(clientId);
             if (room != null) {
                 room.remove(client.getId());
                 room = null;
             }
+            clientPool.removeClient(clientId);
         }
         client.closeSocket();
     }
@@ -198,6 +198,7 @@ public class ThreadSocket extends Thread {
         if (room != null) {
             room.remove(client.getId());
             room = null;
+            sendSuccess(request, roomPool.getRoomInfos());
         } else {
             sendError(request, 700, "you are not in any room");
         }

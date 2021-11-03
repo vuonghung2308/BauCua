@@ -79,7 +79,7 @@ public class Client {
         byte[] data = new byte[5048];
         int bytes = dis.read(data);
         if (bytes < 0) {
-            return null;
+            throw new IOException("connection closed");
         }
         String jsonRequest = new String(
                 data, 0, bytes,
