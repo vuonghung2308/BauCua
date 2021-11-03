@@ -7,9 +7,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import vn.vm.baucua.data.entity.Player;
+import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.data.request.Request;
-import vn.vm.baucua.data.response.DataError;
 import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.util.JsonUtils;
 import vn.vm.baucua.util.Log;
@@ -21,34 +20,34 @@ public class Client {
     private DataInputStream dis;
     private DataOutputStream dos;
 
-    private Player player;
+    private User user;
     private Socket socket;
 
     public Client(Socket socket) {
         this.socket = socket;
     }
 
-    public Player getPlayer() {
-        return player;
+    public void setSocket(Socket socket) {
+        this.socket = socket;
     }
 
-    public int getId() {
-        if (player == null) {
-            return -1;
-        }
-        return player.id;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public Socket getSocket() {
         return socket;
     }
 
-    public void setSocket(Socket socket) {
-        this.socket = socket;
+    public int getId() {
+        if (user == null) {
+            return -1;
+        }
+        return user.id;
     }
 
-    public void setPlayer(Player player) {
-        this.player = player;
+    public User getUser() {
+        return user;
     }
 
     public void closeSocket() throws IOException {
@@ -66,10 +65,14 @@ public class Client {
         dos = new DataOutputStream(os);
     }
 
-    public void send(Response response) throws IOException {
-        String responseJson = JsonUtils.toJson(response);
-        dos.write(responseJson.getBytes(StandardCharsets.UTF_8));
-        dos.flush();
+    public void send(Response response) {
+        try {
+            String responseJson = JsonUtils.toJson(response);
+            dos.write(responseJson.getBytes(StandardCharsets.UTF_8));
+            dos.flush();
+        } catch (IOException e) {
+            Log.e(e);
+        }
     }
 
     public Request receive() throws IOException {
@@ -87,8 +90,9 @@ public class Client {
         remoteIp = remoteIp.replace("/", "");
         Log.d("IP: " + remoteIp + ", request", jsonRequest);
         if (request.content == null) {
-            DataError error = new DataError(398, "no content");
-            Response response = new Response("error", error);
+            Response response = Response.error(
+                    400, request, "no content"
+            );
             send(response);
             return null;
         }

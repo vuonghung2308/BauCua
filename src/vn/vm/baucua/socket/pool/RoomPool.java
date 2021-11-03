@@ -20,13 +20,6 @@ public class RoomPool {
         }
     }
 
-    public static RoomPool getInstance() {
-        if (pool == null) {
-            pool = new RoomPool();
-        }
-        return pool;
-    }
-
     public Room goRoom(int roomId, Client client) {
         Room room = rooms.get(roomId);
         if (room != null) {
@@ -45,10 +38,6 @@ public class RoomPool {
         room.remove(playerId);
     }
 
-    public List<Room> getRooms() {
-        return new ArrayList<>(rooms.values());
-    }
-
     public List<RoomInfo> getRoomInfos() {
         List<Room> list = new ArrayList<>(rooms.values());
         List<RoomInfo> roomInfos = new ArrayList<>();
@@ -58,7 +47,18 @@ public class RoomPool {
         return roomInfos;
     }
 
+    public List<Room> getRooms() {
+        return new ArrayList<>(rooms.values());
+    }
+
     public Room getRoom(int roomId) {
         return rooms.get(roomId);
+    }
+
+    public static RoomPool getInstance() {
+        if (pool == null) {
+            pool = new RoomPool();
+        }
+        return pool;
     }
 }

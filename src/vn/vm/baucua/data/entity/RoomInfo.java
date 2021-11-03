@@ -11,5 +11,4 @@ public class RoomInfo {
         this.name = name;
         this.quantity = quantity;
     }
-
 }

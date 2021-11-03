@@ -7,22 +7,22 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
-import vn.vm.baucua.data.request.RegisterRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.util.JsonUtils;
 
-public class TestClient {
+public class Client1 {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         boolean serverTest = false;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "ductoan";
+        String username = "manhhung";
         String password = username + "@1234";
 
         try (Socket socket = new Socket(host, port)) {
@@ -32,17 +32,17 @@ public class TestClient {
             DataInputStream dis = new DataInputStream(is);
             System.out.println("Connected to ip: " + host + ", port: " + port);
 
-            if (!testLogin(dos, dis, username, password)) {
-                return;
-            }
-//            testListRoom(dos, dis);
+            testLogin(dos, dis, username, password);
             testGoRoom(dos, dis);
-//            testGoRoom(dos, dis);
-//            testOutRoom(dos, dis);
-//              testRegister(dos, dis);
 
             read(dis);
-            testPlayGame(dos, dis);
+            read(dis);
+            
+            Scanner scanner = new Scanner(System.in);
+            int i = scanner.nextInt();
+            if (i == 1) {
+                testPlayGame(dos, dis);
+            }
 
             while (true) {
                 byte[] bytes = new byte[2048];
@@ -50,6 +50,7 @@ public class TestClient {
                 System.out.println("------------------------------------------------");
                 String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
                 System.out.println("Server: " + jsonRes);
+
             }
         }
     }
@@ -128,85 +129,6 @@ public class TestClient {
 
     }
 
-    private static void testOutRoom(
-            DataOutputStream dos,
-            DataInputStream dis
-    ) throws IOException {
-        long startTime = System.currentTimeMillis();
-        Request request = new Request();
-        request.content = "out-room";
-        String jsonReq = JsonUtils.toJson(request);
-
-        dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
-
-        byte[] bytes = new byte[2048];
-        int byteRec = dis.read(bytes);
-        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("------------------------------------------------");
-
-        System.out.println("Request: " + jsonReq);
-        System.out.println("Response: " + jsonRes);
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println("Time call: " + elapsedTime + " ms");
-    }
-
-    private static void testListRoom(
-            DataOutputStream dos,
-            DataInputStream dis
-    ) throws IOException {
-        long startTime = System.currentTimeMillis();
-        Request request = new Request();
-        request.content = "list-room";
-        String jsonReq = JsonUtils.toJson(request);
-
-        dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
-
-        byte[] bytes = new byte[2048];
-        int byteRec = dis.read(bytes);
-        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("------------------------------------------------");
-
-        System.out.println("Request: " + jsonReq);
-        System.out.println("Response: " + jsonRes);
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println("Time call: " + elapsedTime + " ms");
-    }
-
-    private static void testRegister(
-            DataOutputStream dos,
-            DataInputStream dis
-    ) throws IOException {
-        System.out.println("client start register");
-        long startTime = System.currentTimeMillis();
-        Request request = new Request();
-        request.content = "register";
-        RegisterRequest data = new RegisterRequest();
-        data.fullName = "thanh";
-        data.username = "12345";
-        data.password = "111";
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
-
-        dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
-        System.out.println("send thanh công");
-        byte[] bytes = new byte[2048];
-        int byteRec = dis.read(bytes);
-        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("------------------------------------------------");
-
-        System.out.println("Request: " + jsonReq);
-        System.out.println("Response: " + jsonRes);
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println("Time call: " + elapsedTime + " ms");
-
-    }
-
     private static void testPlayGame(
             DataOutputStream dos,
             DataInputStream dis
@@ -230,5 +152,4 @@ public class TestClient {
         long elapsedTime = stopTime - startTime;
         System.out.println("Time call: " + elapsedTime + " ms");
     }
-
 }

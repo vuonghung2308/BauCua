@@ -3,7 +3,7 @@ package vn.vm.baucua.socket.pool;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import vn.vm.baucua.data.entity.Player;
+import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.socket.Client;
 
 public class ClientPool {
@@ -15,17 +15,10 @@ public class ClientPool {
         clients = new HashMap<>();
     }
 
-    public static ClientPool getInstance() {
-        if (pool == null) {
-            pool = new ClientPool();
-        }
-        return pool;
-    }
-
-    public List<Player> getPlayers(List<Integer> ids) {
-        ArrayList<Player> players = new ArrayList<>();
+    public List<User> getPlayers(List<Integer> ids) {
+        ArrayList<User> players = new ArrayList<>();
         ids.forEach((id) -> {
-            players.add(getClient(id).getPlayer());
+            players.add(getClient(id).getUser());
         });
         return players;
     }
@@ -52,5 +45,12 @@ public class ClientPool {
 
     public void removeClient(int id) {
         clients.remove(id);
+    }
+
+    public static ClientPool getInstance() {
+        if (pool == null) {
+            pool = new ClientPool();
+        }
+        return pool;
     }
 }
