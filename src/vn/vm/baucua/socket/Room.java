@@ -3,7 +3,7 @@ package vn.vm.baucua.socket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import vn.vm.baucua.data.entity.Bat;
+import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.Player;
 import vn.vm.baucua.data.entity.RoomInfo;
 import vn.vm.baucua.data.entity.User;
@@ -30,7 +30,7 @@ public class Room {
         clients = new HashMap<>();
         cb = (int seconds) -> {
             sendTime(seconds);
-            if (seconds == 10) {
+            if (seconds == 0) {
                 sendGameResult();
             }
         };
@@ -131,7 +131,7 @@ public class Room {
         return game.isStarted;
     }
 
-    public boolean setBat(int id, Bat bat) {
+    public boolean setBat(int id, Bet bat) {
         if (game.setBat(id, bat)) {
             sendRoomDetail(id);
             return true;

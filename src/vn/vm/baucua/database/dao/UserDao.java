@@ -8,11 +8,12 @@ import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.util.Log;
 
-public class UserrDao {
+public class UserDao {
 
     public User getUser(String username, String password) {
         try {
-            String query = "SELECT * FROM player WHERE `username` = ? AND `password` = SHA2(?,224) ";
+            String query = "SELECT * FROM player "
+                    + "WHERE `username` = ? AND `password` = SHA2(?,224) ";
             ConnectionPool pool = ConnectionPool.getInstance();
             Connection connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
@@ -41,16 +42,16 @@ public class UserrDao {
     public boolean insertUser(String username, String password, String fullName) {
         try {
             String sql = "INSERT INTO player(`username`, `password`, `full_name`, `balance`)"
-                    + "VALUE(?,sha2(?,224),?,?)";
+                    + "VALUE(?,SHA2(?,224),?,?)";
             ConnectionPool pool = ConnectionPool.getInstance();
             int rowInserted;
             try (Connection connection = pool.getConnection()) {
-                PreparedStatement pre = connection.prepareStatement(sql);
-                pre.setString(1, username);
-                pre.setString(2, password);
-                pre.setString(3, fullName);
-                pre.setInt(4, 0);
-                rowInserted = pre.executeUpdate();
+                PreparedStatement statement = connection.prepareStatement(sql);
+                statement.setString(1, username);
+                statement.setString(2, password);
+                statement.setString(3, fullName);
+                statement.setInt(4, 0);
+                rowInserted = statement.executeUpdate();
                 connection.commit();
             }
             return rowInserted > 0;

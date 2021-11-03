@@ -8,13 +8,13 @@ public class Player {
     public boolean status;
     public Long difference;
     public Long balance;
-    public Bat bat;
+    public Bet bet;
 
     public Player(User user) {
         id = user.id;
         username = user.username;
         fullname = user.fullname;
         balance = user.balance;
-        bat = new Bat();
+        bet = new Bet();
     }
 }

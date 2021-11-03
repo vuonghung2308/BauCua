@@ -91,7 +91,7 @@ public class Client {
         Log.d("IP: " + remoteIp + ", request", jsonRequest);
         if (request.content == null) {
             Response response = Response.error(
-                    400, request, "no content"
+                    300, request, "no content"
             );
             send(response);
             return null;

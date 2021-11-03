@@ -8,7 +8,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import vn.vm.baucua.data.entity.Bat;
+import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.Request;
@@ -186,11 +186,13 @@ public class Client2 {
     ) throws IOException {
         long startTime = System.currentTimeMillis();
         Request request = new Request();
-        request.content = "bat";
-        request.data = JsonUtils.toJson(new Bat());
+        request.content = "bet";
+        Bet bat = new Bet();
+        bat.val2 = 2;
+        bat.val5 = 3;
+        request.data = JsonUtils.toJson(bat);
         String jsonReq = JsonUtils.toJson(request);
 
-        System.out.println(jsonReq);
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
         byte[] bytes = new byte[2048];

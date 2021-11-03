@@ -1,6 +1,6 @@
 package vn.vm.baucua.data.entity;
 
-public class Bat {
+public class Bet {
 
     public int val1;
     public int val2;

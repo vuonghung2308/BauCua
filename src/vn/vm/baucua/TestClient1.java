@@ -7,25 +7,24 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.RegisterRequest;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.util.JsonUtils;
 
-public class TestClient {
+public class TestClient1 {
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException {
         boolean serverTest = false;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "ductoan";
+        String username = "thanhngo";
         String password = username + "@1234";
 
         try (Socket socket = new Socket(host, port)) {
@@ -34,18 +33,17 @@ public class TestClient {
             DataOutputStream dos = new DataOutputStream(os);
             DataInputStream dis = new DataInputStream(is);
             System.out.println("Connected to ip: " + host + ", port: " + port);
-
-
+//
             if (!testLogin(dos, dis, username, password)) {
                 return;
             }
-
+            
 //            testListRoom(dos, dis);
             testGoRoom(dos, dis);
-            testChat(dos, dis, "hiii");
-            //            testGoRoom(dos, dis);
-            //            testOutRoom(dos, dis);
-            //              testRegister(dos, dis);
+//            testChat(dos, dis, "hiii");
+//            testGoRoom(dos, dis);
+//            testOutRoom(dos, dis);
+//              testRegister(dos, dis);
 
             while (true) {
                 byte[] bytes = new byte[2048];
@@ -55,14 +53,6 @@ public class TestClient {
                 System.out.println("Server: " + jsonRes);
             }
         }
-    }
-
-    private static void read(DataInputStream dis) throws IOException {
-        byte[] bytes = new byte[2048];
-        int byteRec = dis.read(bytes);
-        System.out.println("------------------------------------------------");
-        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("Server: " + jsonRes);
     }
 
     private static boolean testLogin(
@@ -178,13 +168,12 @@ public class TestClient {
         long elapsedTime = stopTime - startTime;
         System.out.println("Time call: " + elapsedTime + " ms");
     }
-
     private static void testRegister(
             DataOutputStream dos,
             DataInputStream dis
     ) throws IOException {
-        System.out.println("client start register");
-        long startTime = System.currentTimeMillis();
+        System.out.println("client start register"); 
+       long startTime = System.currentTimeMillis();
         Request request = new Request();
         request.content = "register";
         RegisterRequest data = new RegisterRequest();
@@ -210,40 +199,15 @@ public class TestClient {
 
     }
 
-    private static void testPlayGame(
-            DataOutputStream dos,
-            DataInputStream dis
-    ) throws IOException {
-        long startTime = System.currentTimeMillis();
-        Request request = new Request();
-        request.content = "play";
-        String jsonReq = JsonUtils.toJson(request);
-
-        dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
-
-        byte[] bytes = new byte[2048];
-        int byteRec = dis.read(bytes);
-        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("------------------------------------------------");
-
-        System.out.println("Request: " + jsonReq);
-        System.out.println("Response: " + jsonRes);
-
-        long stopTime = System.currentTimeMillis();
-        long elapsedTime = stopTime - startTime;
-        System.out.println("Time call: " + elapsedTime + " ms");
-    }
-
     private static void testChat(DataOutputStream dos, DataInputStream dis, String hiii) {
         try {
             Request request = new Request();
             request.content = "chat_all";
-            ChatMessage chat = new ChatMessage(0, hiii);
-            request.data = JsonUtils.toJson(chat);
+            request.data = hiii;
             String jsonReq = JsonUtils.toJson(request);
             dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
         } catch (IOException ex) {
-            Logger.getLogger(TestClient.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestClient1.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

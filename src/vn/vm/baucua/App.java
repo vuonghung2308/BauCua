@@ -14,13 +14,13 @@ public class App {
     public static boolean debug = true;
 
     public static void main(String[] args) throws IOException {
+        Logger.getRootLogger().setLevel(Level.OFF);
         if (args.length != 0 && args[0].equals("-m")) {
             debug = !args[1].equals("app");
         }
 
-        connectToDatabase();
-        Logger.getRootLogger().setLevel(Level.OFF);
         ServerSocket server = new ServerSocket(1111);
+        connectToDatabase();
 
         String message = "Start listen on address: "
                 + server.getInetAddress().getHostAddress()

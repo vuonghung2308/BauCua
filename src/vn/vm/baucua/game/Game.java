@@ -2,7 +2,7 @@ package vn.vm.baucua.game;
 
 import java.util.ArrayList;
 import vn.vm.baucua.data.entity.Result;
-import vn.vm.baucua.data.entity.Bat;
+import vn.vm.baucua.data.entity.Bet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -12,12 +12,12 @@ import vn.vm.baucua.data.entity.Player;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.data.response.ResultResponse;
-import vn.vm.baucua.database.dao.UserrDao;
+import vn.vm.baucua.database.dao.UserDao;
 
 public class Game {
 
     private final HashMap<Integer, Player> players;
-    private final UserrDao userDao;
+    private final UserDao userDao;
     private final Callback cb;
     private final Task task;
     private Timer timer;
@@ -27,7 +27,7 @@ public class Game {
 
     public Game(Callback callback) {
         players = new HashMap<>();
-        userDao = new UserrDao();
+        userDao = new UserDao();
         task = new Task();
         isStarted = false;
         cb = callback;
@@ -36,7 +36,7 @@ public class Game {
     public void start() {
         isStarted = true;
         timer = new Timer();
-        duration = 15;
+        duration = 60;
         timer.schedule(task, 0, 1000);
         players.forEach((id, player) -> {
             player.difference = null;
@@ -58,11 +58,11 @@ public class Game {
         return new ArrayList<>(players.values());
     }
 
-    public boolean setBat(int id, Bat bat) {
+    public boolean setBat(int id, Bet bat) {
         Player player = players.get(id);
         long amount = bat.getSum() * 10000L;
         if (player.balance >= amount) {
-            player.bat = bat;
+            player.bet = bat;
             return true;
         }
         return false;
@@ -104,7 +104,7 @@ public class Game {
         result = new Result(res);
         players.forEach((id, player) -> {
             long difference = getDifference(
-                    res, player.bat.toArray()
+                    res, player.bet.toArray()
             );
             player.difference = difference;
             player.balance += difference;

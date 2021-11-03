@@ -4,7 +4,7 @@ import vn.vm.baucua.socket.pool.RoomPool;
 import vn.vm.baucua.socket.pool.ClientPool;
 import java.io.IOException;
 import java.net.Socket;
-import vn.vm.baucua.data.entity.Bat;
+import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.data.request.GoRoomRequest;
@@ -12,11 +12,12 @@ import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.RegisterRequest;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.data.response.Response;
-import vn.vm.baucua.database.dao.UserrDao;
+import vn.vm.baucua.database.dao.UserDao;
 import vn.vm.baucua.util.Log;
 
 public class ThreadSocket extends Thread {
 
+    private final UserDao userDao;
     private final Client client;
     private ClientPool clientPool;
     private RoomPool roomPool;
@@ -24,6 +25,7 @@ public class ThreadSocket extends Thread {
 
     public ThreadSocket(Socket socket) {
         client = new Client(socket);
+        userDao = new UserDao();
     }
 
     private void stopThreadSocket() throws IOException {
@@ -51,11 +53,9 @@ public class ThreadSocket extends Thread {
             Request request = client.receive();
 
             if (request.isLoginRequest()) {
-                boolean isCorrectInfo = handleLoginRequest(request);
-                if (isCorrectInfo) {
+                if (handleLoginRequest(request)) {
                     while (true) {
-                        boolean disconnect = !handleOtherRequest();
-                        if (disconnect) {
+                        if (!handleOtherRequest()) {
                             stopThreadSocket();
                             break;
                         }
@@ -63,37 +63,12 @@ public class ThreadSocket extends Thread {
                 } else {
                     stopThreadSocket();
                 }
-            } else if (request.isSignUpRequest()) {
+            } else if (request.isRegisterRequest()) {
                 handleRegister(request);
             }
 
         } catch (IOException ex) {
             Log.e(ex);
-        }
-    }
-
-    private boolean handleLoginRequest(Request request) throws IOException {
-        LoginRequest data = (LoginRequest) request.getDataObject();
-
-        UserrDao playerDao = new UserrDao();
-        User user = playerDao.getUser(data.username, data.password);
-
-        if (user != null) {
-            Client c = clientPool.getClient(user.id);
-            if (c != null) {
-                sendError(request, 2001,
-                        "account is logged in on another device");
-                return false;
-            }
-            client.setUser(user);
-            clientPool.addClient(client);
-            sendSuccess(request, user);
-            sendRoomInfos();
-            return true;
-        } else {
-            sendError(request, 2000,
-                    "wrong username or password");
-            return false;
         }
     }
 
@@ -116,7 +91,7 @@ public class ThreadSocket extends Thread {
                     handleOutRoom(request);
                     break;
                 }
-                case "chat": { // chat private
+                case "chat": {
                     chat(request);
                     break;
                 }
@@ -132,7 +107,7 @@ public class ThreadSocket extends Thread {
                     handlePlay(request);
                     break;
                 }
-                case "bat": {
+                case "bet": {
                     handleBat(request);
                     break;
                 }
@@ -143,23 +118,38 @@ public class ThreadSocket extends Thread {
         }
     }
 
-    private void handleReady(Request request) {
-        if (room.setReady(client.getId())) {
-            sendSuccess(request);
+    private boolean handleLoginRequest(Request request) throws IOException {
+        LoginRequest data = (LoginRequest) request.getDataObject();
+        User user = userDao.getUser(data.username, data.password);
+
+        if (user != null) {
+            Client c = clientPool.getClient(user.id);
+            if (c != null) {
+                sendError(request, 401,
+                        "account is logged in on another device");
+                return false;
+            }
+            client.setUser(user);
+            clientPool.addClient(client);
+            sendSuccess(request, user);
+            sendRoomInfos();
+            return true;
         } else {
-            sendError(request, 6000, "you are ready");
+            sendError(request, 400,
+                    "wrong username or password");
+            return false;
         }
     }
 
     private void handleBat(Request request) {
-        Bat bat = (Bat) request.getDataObject();
+        Bet bet = (Bet) request.getDataObject();
         if (!room.isGameStarted()) {
-            sendError(request, 7001, "game has not started yet");
+            sendError(request, 900, "game has not started yet");
         } else {
-            if (room.setBat(client.getId(), bat)) {
+            if (room.setBat(client.getId(), bet)) {
                 sendSuccess(request);
             } else {
-                sendError(request, 7000, "not enough money");
+                sendError(request, 901, "not enough money");
             }
         }
     }
@@ -170,17 +160,25 @@ public class ThreadSocket extends Thread {
                 sendSuccess(request);
                 room.playGame();
             } else {
-                sendError(request, 5000, "has some one not ready");
+                sendError(request, 1000, "has some one not ready");
             }
         } else {
-            sendError(request, 5001, "you are not host");
+            sendError(request, 1001, "you are not host");
+        }
+    }
+
+    private void handleReady(Request request) {
+        if (room.setReady(client.getId())) {
+            sendSuccess(request);
+        } else {
+            sendError(request, 800, "you are ready");
         }
     }
 
     private void handleGoRoom(Request request) throws IOException {
         GoRoomRequest data = (GoRoomRequest) request.getDataObject();
         if (room != null) {
-            sendError(request, 3002, "you are in a room");
+            sendError(request, 600, "you are in a room");
             return;
         }
         if (Room.count >= data.room_id) {
@@ -189,10 +187,19 @@ public class ThreadSocket extends Thread {
                 sendSuccess(request, room.getRoomDetail());
                 room.sendRoomDetail(client.getId());
             } else {
-                sendError(request, 3000, "room full");
+                sendError(request, 601, "room full");
             }
         } else {
-            sendError(request, 3001, "room not exists");
+            sendError(request, 602, "room not exists");
+        }
+    }
+
+    private void handleOutRoom(Request request) {
+        if (room != null) {
+            room.remove(client.getId());
+            room = null;
+        } else {
+            sendError(request, 700, "you are not in any room");
         }
     }
 
@@ -202,37 +209,34 @@ public class ThreadSocket extends Thread {
         client.send(res);
     }
 
-    private void handleOutRoom(Request request) throws IOException {
-        if (room != null) {
-            room.remove(client.getId());
-            room.sendRoomDetail(-1);
-            room = null;
-        } else {
-            sendError(request, 4000, "you are not in any room");
-        }
-    }
-
     private void handleRegister(Request request) {
         RegisterRequest register = (RegisterRequest) request.getDataObject();
         String username = register.username;
         String password = register.password;
-        String fullName = register.fullName;
-        UserrDao playerDao = new UserrDao();
-        if (playerDao.insertUser(username, password, fullName)) {
+        String fullName = register.fullname;
+        if (userDao.insertUser(username, password, fullName)) {
             sendSuccess(request);
         } else {
-            sendError(request, 7000, "user exists");
+            sendError(request, 500, "account exists");
         }
     }
 
-    private void chat(Request request) { // chat private
+    private void chat(Request request) {
         ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
-        ChatMessage chatMessageSend = new ChatMessage(client.getUser().id, chatMessageReceive.message);
-        Response response = new Response("chat", chatMessageSend, 200);
-        room.sendOneClient(chatMessageReceive.id, response);
+        ChatMessage chatMessageSend = new ChatMessage(
+                client.getId(), chatMessageReceive.message);
+        Response res = Response.success(request, chatMessageSend);
+        sendSuccess(request);
+        room.sendOneClient(chatMessageReceive.id, res);
     }
 
-    private void chatAll(Request request) {// chat all
+    private void chatAll(Request request) {
+        ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
+        ChatMessage chatMessageSend = new ChatMessage(
+                client.getId(), chatMessageReceive.message);
+        Response res = Response.success(request, chatMessageSend);
+        sendSuccess(request);
+        room.sendToAll(res, client.getId());
     }
 
     private void sendError(Request request, int code, String msg) {
