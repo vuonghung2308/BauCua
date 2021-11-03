@@ -128,6 +128,10 @@ public class Game {
         }
     }
 
+    public void remove(int id) {
+        players.remove(id);
+    }
+
     class Task extends TimerTask {
 
         @Override

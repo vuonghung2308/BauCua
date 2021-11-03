@@ -89,8 +89,9 @@ public class Room {
         clients.put(client.getId(), client);
     }
 
-    public void remove(int playerId) {
-        clients.remove(playerId);
+    public void remove(int id) {
+        clients.remove(id);
+        game.remove(id);
         sendRoomDetail(-1);
     }
 
