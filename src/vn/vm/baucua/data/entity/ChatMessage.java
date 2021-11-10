@@ -9,4 +9,7 @@ public class ChatMessage {
         this.message = msg;
         this.id = id;
     }
+
+    public ChatMessage() {
+    }
 }

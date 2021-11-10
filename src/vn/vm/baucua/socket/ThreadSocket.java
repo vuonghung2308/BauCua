@@ -96,7 +96,7 @@ public class ThreadSocket extends Thread {
                     break;
                 }
                 case "chat_all": {
-                    chatAll(request);
+                    handleChatAll(request);
                     break;
                 }
                 case "ready": {
@@ -111,6 +111,9 @@ public class ThreadSocket extends Thread {
                     handleBat(request);
                     break;
                 }
+                case "ping": {
+                    break;
+                }
             }
             return true;
         } catch (IOException e) {
@@ -121,7 +124,6 @@ public class ThreadSocket extends Thread {
     private boolean handleLoginRequest(Request request) throws IOException {
         LoginRequest data = (LoginRequest) request.getDataObject();
         User user = userDao.getUser(data.username, data.password);
-
         if (user != null) {
             Client c = clientPool.getClient(user.id);
             if (c != null) {
@@ -181,8 +183,8 @@ public class ThreadSocket extends Thread {
             sendError(request, 600, "you are in a room");
             return;
         }
-        if (Room.count >= data.room_id) {
-            room = roomPool.goRoom(data.room_id, client);
+        if (Room.count >= data.id) {
+            room = roomPool.goRoom(data.id, client);
             if (room != null) {
                 sendSuccess(request, room.getRoomDetail());
                 room.sendRoomDetail(client.getId());
@@ -210,7 +212,7 @@ public class ThreadSocket extends Thread {
         client.send(res);
     }
 
-    private void handleRegister(Request request) {
+    private void handleRegister(Request request) throws IOException {
         RegisterRequest register = (RegisterRequest) request.getDataObject();
         String username = register.username;
         String password = register.password;
@@ -220,6 +222,7 @@ public class ThreadSocket extends Thread {
         } else {
             sendError(request, 500, "account exists");
         }
+        stopThreadSocket();
     }
 
     private void chat(Request request) {
@@ -231,12 +234,12 @@ public class ThreadSocket extends Thread {
         room.sendOneClient(chatMessageReceive.id, res);
     }
 
-    private void chatAll(Request request) {
+    private void handleChatAll(Request request) {
         ChatMessage chatMessageReceive = (ChatMessage) request.getDataObject();
         ChatMessage chatMessageSend = new ChatMessage(
                 client.getId(), chatMessageReceive.message);
         Response res = Response.success(request, chatMessageSend);
-        sendSuccess(request);
+        sendSuccess(request, chatMessageSend);
         room.sendToAll(res, client.getId());
     }
 

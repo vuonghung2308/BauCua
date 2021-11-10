@@ -19,16 +19,15 @@ public class Game {
     private final HashMap<Integer, Player> players;
     private final UserDao userDao;
     private final Callback cb;
-    private final Task task;
+    public boolean isStarted;
     private Timer timer;
     private Result result;
     private int duration;
-    public boolean isStarted;
+    private Task task;
 
     public Game(Callback callback) {
         players = new HashMap<>();
         userDao = new UserDao();
-        task = new Task();
         isStarted = false;
         cb = callback;
     }
@@ -36,10 +35,12 @@ public class Game {
     public void start() {
         isStarted = true;
         timer = new Timer();
-        duration = 60;
+        task = new Task();
+        duration = 20;
         timer.schedule(task, 0, 1000);
         players.forEach((id, player) -> {
-            player.difference = null;
+            player.difference = 0L;
+            player.bet = new Bet();
         });
     }
 
@@ -112,10 +113,16 @@ public class Game {
         });
     }
 
-    public boolean canPlay() {
-        return players.values().stream().noneMatch((player)
-                -> (player.status == false)
-        );
+    public boolean canPlay(int hostId) {
+        boolean canPlay = true;
+        if (!players.values().stream().filter(
+                player -> player.id != hostId
+        ).noneMatch(
+                player -> player.status == false
+        )) {
+            return false;
+        }
+        return canPlay;
     }
 
     public boolean setReady(int id) {
@@ -136,15 +143,20 @@ public class Game {
 
         @Override
         public void run() {
-            if (duration == 10) {
+            if (duration == 1) {
                 play();
             }
             if (duration == 0) {
-                timer.cancel();
                 isStarted = false;
+                players.values().forEach(p -> {
+                    p.status = false;
+                });
+                cb.doSomeThing(duration);
+                timer.cancel();
+            } else {
+                cb.doSomeThing(duration);
+                duration--;
             }
-            cb.doSomeThing(duration);
-            duration--;
         }
     }
 

@@ -26,56 +26,16 @@ public class Room {
 
     public Room() {
         id = count++;
-        name = Integer.toString((1000 + id));
+        name = Integer.toString((100 + id));
         clients = new HashMap<>();
         cb = (int seconds) -> {
             sendTime(seconds);
             if (seconds == 0) {
                 sendGameResult();
+                updateClient();
             }
         };
         game = new Game(cb);
-    }
-
-    private void sendTime(int seconds) {
-        Response response = TimeResponse.get(seconds);
-        sendToAll(response, -1);
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void sendToAll(Response response, int ignore) {
-        clients.values().forEach((client) -> {
-            if (client.getId() != ignore) {
-                client.send(response);
-            }
-        });
-    }
-
-    public RoomDetailResponse getRoomDetail() {
-        RoomDetailResponse detail = new RoomDetailResponse();
-        detail.players = game.getPlayers();
-        detail.quantity = clients.size();
-        detail.host_id = hostId;
-        detail.name = name;
-        detail.id = id;
-        return detail;
-    }
-
-    public List<Player> getUsers() {
-        return game.getPlayers();
-    }
-
-    public List<Client> getClients() {
-        return new ArrayList<>(clients.values());
-    }
-
-    public RoomInfo getRoomInfo() {
-        return new RoomInfo(
-                id, name, clients.size()
-        );
     }
 
     public void addClient(Client client) {
@@ -89,14 +49,27 @@ public class Room {
         clients.put(client.getId(), client);
     }
 
-    public void remove(int id) {
-        clients.remove(id);
-        game.remove(id);
-        sendRoomDetail(-1);
+    public RoomDetailResponse getRoomDetail() {
+        RoomDetailResponse detail = new RoomDetailResponse();
+        detail.players = game.getPlayers();
+        detail.quantity = clients.size();
+        detail.host_id = hostId;
+        detail.name = name;
+        detail.id = id;
+        return detail;
     }
 
-    public int numberClient() {
-        return clients.size();
+    public void sendToAll(Response response, int ignore) {
+        clients.values().forEach((client) -> {
+            if (client.getId() != ignore) {
+                client.send(response);
+            }
+        });
+    }
+
+    private void sendTime(int seconds) {
+        Response response = TimeResponse.get(seconds);
+        sendToAll(response, -1);
     }
 
     public void sendOneClient(int id, Response response) {
@@ -115,10 +88,6 @@ public class Room {
         sendToAll(playersResponse, ignore);
     }
 
-    public boolean isHost(int id) {
-        return id == hostId;
-    }
-
     public boolean setReady(int id) {
         boolean setOke = game.setReady(id);
         if (setOke) {
@@ -128,8 +97,13 @@ public class Room {
         return false;
     }
 
-    public boolean isGameStarted() {
-        return game.isStarted;
+    private void updateClient() {
+        game.getPlayers().forEach(player -> {
+            Client client = clients.get(player.id);
+            User user = client.getUser();
+            user.balance = player.balance;
+
+        });
     }
 
     public boolean setBat(int id, Bet bat) {
@@ -140,11 +114,47 @@ public class Room {
         return false;
     }
 
+    public List<Client> getClients() {
+        return new ArrayList<>(clients.values());
+    }
+
+    public RoomInfo getRoomInfo() {
+        return new RoomInfo(
+                id, name, clients.size()
+        );
+    }
+
+    public void remove(int id) {
+        clients.remove(id);
+        game.remove(id);
+        sendRoomDetail(-1);
+    }
+
+    public List<Player> getUsers() {
+        return game.getPlayers();
+    }
+
+    public boolean isHost(int id) {
+        return id == hostId;
+    }
+
+    public boolean isGameStarted() {
+        return game.isStarted;
+    }
+
     public boolean canPlay() {
-        return game.canPlay();
+        return game.canPlay(hostId);
+    }
+
+    public int numberClient() {
+        return clients.size();
     }
 
     public void playGame() {
         game.start();
+    }
+
+    public Integer getId() {
+        return id;
     }
 }

@@ -12,7 +12,7 @@ import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.Request;
-import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.StroUtils;
 
 public class Client2 {
 
@@ -23,7 +23,7 @@ public class Client2 {
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "ductoan";
+        String username = "manhhung";
         String password = username + "@1234";
 
         try (Socket socket = new Socket(host, port)) {
@@ -77,8 +77,8 @@ public class Client2 {
         data.password = password;
         Request request = new Request();
         request.content = "login";
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -112,9 +112,9 @@ public class Client2 {
         Request request = new Request();
         request.content = "go_room";
         GoRoomRequest data = new GoRoomRequest();
-        data.room_id = 1;
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        data.id = 1;
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -139,7 +139,7 @@ public class Client2 {
         long startTime = System.currentTimeMillis();
         Request request = new Request();
         request.content = "play";
-        String jsonReq = JsonUtils.toJson(request);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -163,7 +163,7 @@ public class Client2 {
         long startTime = System.currentTimeMillis();
         Request request = new Request();
         request.content = "ready";
-        String jsonReq = JsonUtils.toJson(request);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -190,8 +190,8 @@ public class Client2 {
         Bet bat = new Bet();
         bat.val2 = 2;
         bat.val5 = 3;
-        request.data = JsonUtils.toJson(bat);
-        String jsonReq = JsonUtils.toJson(request);
+        request.data = StroUtils.toStro(bat);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 

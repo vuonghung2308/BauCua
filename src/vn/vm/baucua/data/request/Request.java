@@ -2,15 +2,15 @@ package vn.vm.baucua.data.request;
 
 import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.entity.Bet;
-import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.StroUtils;
 
 public class Request {
 
     public String content;
     public String data;
 
-    public Request(String json) {
-        Request req = JsonUtils.fromJson(json, Request.class);
+    public Request(String string) {
+        Request req = StroUtils.fromStro(string, Request.class);
         this.content = req.content;
         this.data = req.data;
     }
@@ -37,7 +37,7 @@ public class Request {
     }
 
     private <T> Object dataFromJson(Class<T> aClass) {
-        return JsonUtils.fromJson(data, aClass);
+        return StroUtils.fromStro(data, aClass);
     }
 
     public boolean isLoginRequest() {

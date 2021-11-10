@@ -2,13 +2,13 @@ package vn.vm.baucua.data.entity;
 
 public class Result {
 
-    public int val1;
-    public int val2;
-    public int val3;
+    public int rs1;
+    public int rs2;
+    public int rs3;
 
     public Result(int[] res) {
-        val1 = res[0];
-        val2 = res[1];
-        val3 = res[2];
+        rs1 = res[0];
+        rs2 = res[1];
+        rs3 = res[2];
     }
 }

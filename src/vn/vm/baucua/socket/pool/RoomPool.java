@@ -23,7 +23,7 @@ public class RoomPool {
     public Room goRoom(int roomId, Client client) {
         Room room = rooms.get(roomId);
         if (room != null) {
-            if (room.numberClient() < 2) {
+            if (room.numberClient() < 5) {
                 room.addClient(client);
                 return room;
             }

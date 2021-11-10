@@ -6,7 +6,7 @@ import vn.vm.baucua.data.entity.Player;
 public class RoomDetailResponse {
 
     public List<Player> players;
-    public Integer quantity;
+    public int quantity;
     public String name;
     public int host_id;
     public int id;

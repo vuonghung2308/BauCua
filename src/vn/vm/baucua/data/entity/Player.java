@@ -6,8 +6,8 @@ public class Player {
     public String username;
     public String fullname;
     public boolean status;
-    public Long difference;
-    public Long balance;
+    public long difference;
+    public long balance;
     public Bet bet;
 
     public Player(User user) {

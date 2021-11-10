@@ -8,10 +8,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.Request;
-import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.StroUtils;
 
 public class Client1 {
 
@@ -33,7 +34,7 @@ public class Client1 {
             System.out.println("Connected to ip: " + host + ", port: " + port);
 
             testLogin(dos, dis, username, password);
-//            testGoRoom(dos, dis);
+            testGoRoom(dos, dis);
 
             read(dis);
             read(dis);
@@ -74,8 +75,8 @@ public class Client1 {
         data.password = password;
         Request request = new Request();
         request.content = "login";
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -109,9 +110,9 @@ public class Client1 {
         Request request = new Request();
         request.content = "go_room";
         GoRoomRequest data = new GoRoomRequest();
-        data.room_id = 1;
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        data.id = 1;
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -136,7 +137,7 @@ public class Client1 {
         long startTime = System.currentTimeMillis();
         Request request = new Request();
         request.content = "play";
-        String jsonReq = JsonUtils.toJson(request);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 

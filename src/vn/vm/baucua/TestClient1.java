@@ -13,12 +13,12 @@ import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.RegisterRequest;
 import vn.vm.baucua.data.request.Request;
-import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.StroUtils;
 
 public class TestClient1 {
 
     public static void main(String[] args) throws IOException {
-        boolean serverTest = false;
+        boolean serverTest = true;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;
@@ -66,8 +66,8 @@ public class TestClient1 {
         data.password = password;
         Request request = new Request();
         request.content = "login";
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -101,9 +101,9 @@ public class TestClient1 {
         Request request = new Request();
         request.content = "go_room";
         GoRoomRequest data = new GoRoomRequest();
-        data.room_id = 1;
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        data.id = 1;
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -128,7 +128,7 @@ public class TestClient1 {
         long startTime = System.currentTimeMillis();
         Request request = new Request();
         request.content = "out_room";
-        String jsonReq = JsonUtils.toJson(request);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -152,7 +152,7 @@ public class TestClient1 {
         long startTime = System.currentTimeMillis();
         Request request = new Request();
         request.content = "list_room";
-        String jsonReq = JsonUtils.toJson(request);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
 
@@ -180,8 +180,8 @@ public class TestClient1 {
         data.fullname = "thanh";
         data.username = "12345";
         data.password = "111";
-        request.data = JsonUtils.toJson(data);
-        String jsonReq = JsonUtils.toJson(request);
+        request.data = StroUtils.toStro(data);
+        String jsonReq = StroUtils.toStro(request);
 
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
         System.out.println("send thanh công");
@@ -204,7 +204,7 @@ public class TestClient1 {
             Request request = new Request();
             request.content = "chat_all";
             request.data = hiii;
-            String jsonReq = JsonUtils.toJson(request);
+            String jsonReq = StroUtils.toStro(request);
             dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
         } catch (IOException ex) {
             Logger.getLogger(TestClient1.class.getName()).log(Level.SEVERE, null, ex);

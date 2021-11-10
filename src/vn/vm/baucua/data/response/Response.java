@@ -1,7 +1,7 @@
 package vn.vm.baucua.data.response;
 
 import vn.vm.baucua.data.request.Request;
-import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.StroUtils;
 
 public class Response {
 
@@ -17,7 +17,7 @@ public class Response {
     }
 
     public Response(String content, Object data, int code) {
-        this.data = JsonUtils.toJson(data);
+        this.data = StroUtils.toStro(data);
         this.content = content;
         this.code = code;
     }
@@ -41,5 +41,9 @@ public class Response {
 
     public static Response success(Request request) {
         return new Response(request.content, 200);
+    }
+
+    public static Response ping() {
+        return new Response("ping", 200);
     }
 }

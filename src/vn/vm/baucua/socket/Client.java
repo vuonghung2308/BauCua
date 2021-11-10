@@ -7,10 +7,12 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Timer;
+import java.util.TimerTask;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.data.request.Request;
 import vn.vm.baucua.data.response.Response;
-import vn.vm.baucua.util.JsonUtils;
+import vn.vm.baucua.util.StroUtils;
 import vn.vm.baucua.util.Log;
 
 public class Client {
@@ -19,12 +21,14 @@ public class Client {
     private OutputStream os;
     private DataInputStream dis;
     private DataOutputStream dos;
+    private Timer timer;
 
     private User user;
     private Socket socket;
 
     public Client(Socket socket) {
         this.socket = socket;
+        schedulePing();
     }
 
     public void setSocket(Socket socket) {
@@ -56,6 +60,9 @@ public class Client {
         is.close();
         os.close();
         socket.close();
+        if (timer != null) {
+            timer.cancel();
+        }
     }
 
     public void initSocket() throws IOException {
@@ -67,9 +74,12 @@ public class Client {
 
     public void send(Response response) {
         try {
-            String responseJson = JsonUtils.toJson(response);
+            String responseJson = StroUtils.toStro(response);
             dos.write(responseJson.getBytes(StandardCharsets.UTF_8));
+            printLog(responseJson, false);
+            schedulePing();
             dos.flush();
+
         } catch (IOException e) {
             Log.e(e);
         }
@@ -81,14 +91,16 @@ public class Client {
         if (bytes < 0) {
             throw new IOException("connection closed");
         }
+
+        schedulePing();
         String jsonRequest = new String(
                 data, 0, bytes,
                 StandardCharsets.UTF_8
         );
+
+        printLog(jsonRequest, true);
+
         Request request = new Request(jsonRequest);
-        String remoteIp = socket.getRemoteSocketAddress().toString();
-        remoteIp = remoteIp.replace("/", "");
-        Log.d("IP: " + remoteIp + ", request", jsonRequest);
         if (request.content == null) {
             Response response = Response.error(
                     300, request, "no content"
@@ -96,6 +108,34 @@ public class Client {
             send(response);
             return null;
         }
+        schedulePing();
         return request;
+    }
+
+    private void printLog(String json, boolean req) {
+        String remoteIp = socket
+                .getRemoteSocketAddress()
+                .toString();
+        remoteIp = remoteIp.replace("/", "");
+        String action = "request";
+        if (req == false) {
+            action = "response";
+        }
+        Log.d("IP: " + remoteIp + ", "
+                + action, json);
+    }
+
+    private void schedulePing() {
+        if (timer != null) {
+            timer.cancel();
+        }
+        timer = new Timer();
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                send(Response.ping());
+            }
+        };
+        timer.schedule(task, 60000);
     }
 }
