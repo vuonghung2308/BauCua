@@ -1,4 +1,4 @@
-package vn.vm.baucua;
+package vn.vm.baucua.test;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
-import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.Request;
@@ -17,7 +16,7 @@ import vn.vm.baucua.util.StroUtils;
 public class Client1 {
 
     public static void main(String[] args) throws IOException {
-        boolean serverTest = true;
+        boolean serverTest = false;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;

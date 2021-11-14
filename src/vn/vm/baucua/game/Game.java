@@ -22,8 +22,16 @@ public class Game {
     public boolean isStarted;
     private Timer timer;
     private Result result;
-    private int duration;
+    private Integer duration;
     private Task task;
+
+    public synchronized Integer getDuration() {
+        return duration;
+    }
+
+    public synchronized void setDuration(Integer duration) {
+        this.duration = duration;
+    }
 
     public Game(Callback callback) {
         players = new HashMap<>();
@@ -135,6 +143,16 @@ public class Game {
         }
     }
 
+    public boolean setUnready(int id) {
+        Player player = players.get(id);
+        if (player.status == true) {
+            player.status = false;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public void remove(int id) {
         players.remove(id);
     }
@@ -143,21 +161,23 @@ public class Game {
 
         @Override
         public void run() {
-            if (duration == 1) {
+            if (getDuration() == 1) {
                 play();
             }
-            if (duration == 0) {
+            if (getDuration() == 0) {
                 isStarted = false;
                 players.values().forEach(p -> {
                     p.status = false;
                 });
-                cb.doSomeThing(duration);
+                cb.doSomeThing(getDuration());
+            }
+            if (getDuration() == -1) {
+                cb.doSomeThing(getDuration());
                 timer.cancel();
             } else {
-                cb.doSomeThing(duration);
-                duration--;
+                cb.doSomeThing(getDuration());
+                setDuration(getDuration() - 1);
             }
         }
     }
-
 }

@@ -12,6 +12,7 @@ import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.data.response.TimeResponse;
 import vn.vm.baucua.game.Callback;
 import vn.vm.baucua.game.Game;
+import vn.vm.baucua.util.ThreadUtils;
 
 public class Room {
 
@@ -46,7 +47,7 @@ public class Room {
         } else {
             game.addPlayer(user);
         }
-        clients.put(client.getId(), client);
+        clients.put(user.id, client);
     }
 
     public RoomDetailResponse getRoomDetail() {
@@ -60,10 +61,12 @@ public class Room {
     }
 
     public void sendToAll(Response response, int ignore) {
-        clients.values().forEach((client) -> {
-            if (client.getId() != ignore) {
-                client.send(response);
-            }
+        ThreadUtils.runInNewThread(() -> {
+            clients.values().forEach((client) -> {
+                if (client.getId() != ignore) {
+                    client.send(response);
+                }
+            });
         });
     }
 
@@ -90,6 +93,15 @@ public class Room {
 
     public boolean setReady(int id) {
         boolean setOke = game.setReady(id);
+        if (setOke) {
+            sendRoomDetail(id);
+            return true;
+        }
+        return false;
+    }
+
+    boolean setUnready(int id) {
+        boolean setOke = game.setUnready(id);
         if (setOke) {
             sendRoomDetail(id);
             return true;
@@ -125,9 +137,21 @@ public class Room {
     }
 
     public void remove(int id) {
+        boolean isHostChange = false;
         clients.remove(id);
         game.remove(id);
+        List<Client> list = getClients();
+        if (!list.isEmpty() && id == hostId) {
+            hostId = list.get(0).getId();
+            isHostChange = true;
+        }
         sendRoomDetail(-1);
+        if (isHostChange) {
+            Response response = new Response(
+                    "host_change",
+                    String.valueOf(hostId));
+            sendToAll(response, -1);
+        }
     }
 
     public List<Player> getUsers() {

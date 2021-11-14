@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.socket.ThreadSocket;
 import vn.vm.baucua.util.Log;
+import vn.vm.baucua.util.ThreadUtils;
 
 public class App {
 
@@ -34,10 +35,9 @@ public class App {
     }
 
     private static void connectToDatabase() {
-        Thread connectThread = new Thread(() -> {
+        ThreadUtils.runInNewThread(() -> {
             ConnectionPool.getInstance();
             Log.d("App", "Connected to database.");
         });
-        connectThread.start();
     }
 }

@@ -12,9 +12,10 @@ public class UserDao {
 
     public User getUser(String username, String password) {
         String query = "SELECT * FROM player "
-                + "WHERE `username` = ? AND `password` = SHA2(?,224) ";
+                + "WHERE `username` = ? AND `password` = SHA2(?,224) limit 1";
         ConnectionPool pool = ConnectionPool.getInstance();
         Connection connection = null;
+        User user = null;
         try {
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
@@ -22,17 +23,12 @@ public class UserDao {
             statement.setString(2, password);
             ResultSet results = statement.executeQuery();
             if (results.next()) {
-                User user = new User();
+                user = new User();
                 user.id = results.getInt("id");
                 user.username = results.getString("username");
                 user.fullname = results.getString("full_name");
                 user.balance = results.getLong("balance");
-
-                results.close();
-                return user;
             }
-            return null;
-
         } catch (SQLException | NullPointerException e) {
             Log.e(e);
             throw new RuntimeException("Can't access to database");
@@ -45,6 +41,7 @@ public class UserDao {
                 Log.e(e);
             }
         }
+        return user;
     }
 
     public boolean userExists(String username) {
@@ -62,7 +59,6 @@ public class UserDao {
             }
         } catch (SQLException ex) {
             Log.e(ex);
-            return false;
         } finally {
             try {
                 if (connection != null) {
@@ -77,25 +73,22 @@ public class UserDao {
 
     public boolean insertUser(String username, String password, String fullName) {
         if (!userExists(username)) {
+            int rowInserted = 0;
             ConnectionPool pool = ConnectionPool.getInstance();
             Connection connection = null;
             String sql = "INSERT INTO player(`username`, `password`, `full_name`, `balance`)"
                     + "VALUE(?,SHA2(?,224),?,?)";
             try {
-                int rowInserted;
                 connection = pool.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
                 statement.setString(1, username);
                 statement.setString(2, password);
                 statement.setString(3, fullName);
-                statement.setInt(4, 0);
+                statement.setLong(4, 200000);
                 rowInserted = statement.executeUpdate();
-                connection.commit();
 
-                return rowInserted > 0;
             } catch (SQLException ex) {
                 Log.e(ex);
-                return false;
             } finally {
                 try {
                     if (connection != null) {
@@ -105,6 +98,7 @@ public class UserDao {
                     Log.e(e);
                 }
             }
+            return rowInserted > 0;
         } else {
             return false;
         }
@@ -121,8 +115,6 @@ public class UserDao {
             statement.setLong(1, balance);
             statement.setLong(2, id);
             statement.executeUpdate();
-            connection.commit();
-            connection.close();
         } catch (SQLException e) {
             Log.e(e);
         } finally {

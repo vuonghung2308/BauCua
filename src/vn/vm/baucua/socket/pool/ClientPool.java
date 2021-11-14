@@ -3,6 +3,7 @@ package vn.vm.baucua.socket.pool;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.socket.Client;
 
@@ -45,6 +46,12 @@ public class ClientPool {
 
     public void removeClient(int id) {
         clients.remove(id);
+    }
+    
+    public List<Client> clientsNotInRoom() {
+        return getClients().stream().filter(
+                client -> client.notInRoom())
+                .collect(Collectors.toList());
     }
 
     public static ClientPool getInstance() {

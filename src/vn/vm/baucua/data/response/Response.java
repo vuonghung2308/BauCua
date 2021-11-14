@@ -22,6 +22,12 @@ public class Response {
         this.code = code;
     }
 
+    public Response(String content, String data) {
+        this.content = content;
+        this.data = data;
+        code = 200;
+    }
+
     public Response(String content, Integer code) {
         this.content = content;
         this.code = code;

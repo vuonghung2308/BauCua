@@ -16,5 +16,6 @@ public class Player {
         fullname = user.fullname;
         balance = user.balance;
         bet = new Bet();
+        difference = 0;
     }
 }

@@ -1,4 +1,4 @@
-package vn.vm.baucua;
+package vn.vm.baucua.test;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,13 +17,13 @@ import vn.vm.baucua.util.StroUtils;
 public class Client2 {
 
     public static void main(String[] args) throws IOException {
-        boolean serverTest = true;
+        boolean serverTest = false;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "manhhung";
+        String username = "ductoan";
         String password = username + "@1234";
 
         try (Socket socket = new Socket(host, port)) {
