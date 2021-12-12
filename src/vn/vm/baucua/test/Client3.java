@@ -38,8 +38,8 @@ public class Client3 {
         String username = "ductoan";
         String password = username + "@1234";
         String email = "mutrangaoden@gmail.com";
-        String newPass = "1234567890";
-        String key = "1067457";
+        String newPass = "123456";
+        String key = "425976";
 
         try (Socket socket = new Socket(host, port)) {
             InputStream is = socket.getInputStream();
@@ -49,11 +49,11 @@ public class Client3 {
             System.out.println("Connected to ip: " + host + ", port: " + port);
 
 
-            if (!testLogin(dos, dis, username, "1234567890")) {
-                return;
-            }
+//            if (!testLogin(dos, dis, username, "1234567890")) {
+//                return;
+//            }
                 
-//            testForgotpass(dos, dis, username, email);
+            testForgotpass(dos, dis, username, email);
 //            testRank(dos, dis);
 //            testCreateNewPass(dos, dis, username, newPass, key);
 

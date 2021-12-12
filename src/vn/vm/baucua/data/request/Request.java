@@ -56,7 +56,7 @@ public class Request {
         return content.equals("forgot_password");
     }
 
-    public boolean isCreateNewPasswordForgot(){
+    public boolean isCreateNewPassword(){
         return content.equals("create_password_forgot");
     }
 }

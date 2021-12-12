@@ -49,10 +49,10 @@ public class ThreadSocket extends Thread {
             } else if (request.isRegisterRequest()) { // done
                 client.handleRegister(request);
                 stopThreadSocket();
-            } else if(request.isForgotPassword()){
+            } else if(request.isForgotPassword()){ // done
                 client.handleForgot(request);
                 stopThreadSocket();
-            }else if(request.isCreateNewPasswordForgot()){
+            }else if(request.isCreateNewPassword()){
                 client.handleCreate(request);
                 stopThreadSocket();
             }
