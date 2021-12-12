@@ -38,7 +38,7 @@ public class ThreadSocket extends Thread {
             if (request.isLoginRequest()) {
                 if (client.handleLoginRequest(request)) {
                     while (true) {
-                        if (!handleOtherRequest()) {
+                        if (!handleOtherRequest()) { // còn rank request
                             stopThreadSocket();
                             break;
                         }
@@ -46,8 +46,14 @@ public class ThreadSocket extends Thread {
                 } else {
                     stopThreadSocket();
                 }
-            } else if (request.isRegisterRequest()) {
+            } else if (request.isRegisterRequest()) { // done
                 client.handleRegister(request);
+                stopThreadSocket();
+            } else if(request.isForgotPassword()){
+                client.handleForgot(request);
+                stopThreadSocket();
+            }else if(request.isCreateNewPasswordForgot()){
+                client.handleCreate(request);
                 stopThreadSocket();
             }
 
@@ -106,10 +112,14 @@ public class ThreadSocket extends Thread {
                 case "ping": {
                     break;
                 }
+                case "rank": { // chưa xong
+                    client.handRank(request);
+                }
             }
             return true;
         } catch (IOException e) {
             return false;
         }
     }
+
 }
