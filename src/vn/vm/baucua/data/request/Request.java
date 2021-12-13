@@ -34,8 +34,10 @@ public class Request {
                 return dataFromJson(Bet.class);
             case "forgot_password":
                 return dataFromJson(ForgotPasswordRequest.class);
-            case "create_password_forgot":
-                return dataFromJson(CreateNewPassForgot.class);
+            case "submit_code":
+                return data;
+            case "submit_pass":
+                return data;
         }
         return null;
     }
@@ -56,7 +58,11 @@ public class Request {
         return content.equals("forgot_password");
     }
 
-    public boolean isCreateNewPassword(){
-        return content.equals("create_password_forgot");
+    public boolean isSubmitCode() {
+        return content.equals("submit_code");
+    }
+
+    public boolean isSubmitNewPassword() {
+        return content.equals("submit_pass");
     }
 }

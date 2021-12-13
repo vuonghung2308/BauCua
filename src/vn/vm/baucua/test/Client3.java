@@ -12,15 +12,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import vn.vm.baucua.data.entity.ChatMessage;
-import vn.vm.baucua.data.request.CreateNewPassForgot;
 import vn.vm.baucua.data.request.ForgotPasswordRequest;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.RegisterRequest;
 import vn.vm.baucua.data.request.Request;
+import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.util.StroUtils;
 
 /**
@@ -35,7 +36,7 @@ public class Client3 {
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "ductoan";
+        String username = "thanhngo";
         String password = username + "@1234";
         String email = "mutrangaoden@gmail.com";
         String newPass = "123456";
@@ -47,15 +48,17 @@ public class Client3 {
             DataOutputStream dos = new DataOutputStream(os);
             DataInputStream dis = new DataInputStream(is);
             System.out.println("Connected to ip: " + host + ", port: " + port);
-
-
-//            if (!testLogin(dos, dis, username, "1234567890")) {
-//                return;
-//            }
+//
+//
+            if (!testLogin(dos, dis, username, "thanh123456")) {
+                return;
+            }
                 
-            testForgotpass(dos, dis, username, email);
+//            testForgotpass(dos, dis, username, email);
 //            testRank(dos, dis);
 //            testCreateNewPass(dos, dis, username, newPass, key);
+//            testSubmitCode(dos, dis, username, email);
+//            testSubmitPass(dos, dis, username, email);
 
         }
     }
@@ -117,23 +120,45 @@ public class Client3 {
         String jsonReq = StroUtils.toStro(request);
         
         dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
-
+/////////////////////////////////////////////////
         byte[] bytes = new byte[2048];
         int byteRec = dis.read(bytes);
         String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-
-        System.out.println("------------------------------------------------");
-        System.out.println("Request: " + jsonReq);
-        System.out.println("Response: " + jsonRes);
-
-        bytes = new byte[2048];
-        byteRec = dis.read(bytes);
-        if (byteRec == -1) {
-            return ;
-        }
-        jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("List rank: " + jsonRes);
         
+        System.out.println(jsonRes);
+//        Response response = StroUtils.fromStro(jsonRes, Response.class);
+        if(true){
+            System.out.println("Nhap code: ");
+            Scanner input = new Scanner(System.in);
+            String code = input.next();
+            
+            request = new Request();
+            request.content = "submit_code";
+            request.data = code;
+            jsonReq = StroUtils.toStro(request);
+            dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
+            
+//            response = StroUtils.fromStro(jsonRes, Response.class);
+            if(true){
+                System.out.println("Nhap code: ");
+                input = new Scanner(System.in);
+                String newPass = input.nextLine();
+
+                request = new Request();
+                request.content = "submit_pass";
+                request.data = newPass;
+                jsonReq = StroUtils.toStro(request);
+                dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
+                
+                bytes = new byte[2048];
+                byteRec = dis.read(bytes);
+                jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
+
+                System.out.println("------------------------------------------------");
+                System.out.println("Request: " + jsonReq);
+                System.out.println("Response: " + jsonRes);
+            }
+        }
         long endTime = System.currentTimeMillis();
         System.out.println("Time excute: " + (endTime - startTime) + "ms");
     }
@@ -166,37 +191,15 @@ public class Client3 {
         System.out.println("Time excute: " + (endTime - startTime) + "ms");
     }
 
-    private static void testCreateNewPass(DataOutputStream dos, DataInputStream dis, String username, String newPass, String key) throws IOException {
-        long startTime = System.currentTimeMillis();
-        CreateNewPassForgot data = new CreateNewPassForgot();
-        data.username = username;
-        data.newPass = newPass;
-        data.key = key;
-        Request request = new Request();
-        request.content = "create_password_forgot";
-        request.data = StroUtils.toStro(data);
-        String jsonReq = StroUtils.toStro(request);
-
-        dos.write(jsonReq.getBytes(StandardCharsets.UTF_8));
-
-        byte[] bytes = new byte[2048];
-        int byteRec = dis.read(bytes);
-        String jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-
-        System.out.println("------------------------------------------------");
-        System.out.println("Request: " + jsonReq);
-        System.out.println("Response: " + jsonRes);
-
-        bytes = new byte[2048];
-        byteRec = dis.read(bytes);
-        if (byteRec == -1) {
-            return ;
-        }
-        jsonRes = new String(bytes, 0, byteRec, StandardCharsets.UTF_8);
-        System.out.println("cái gì đấy: " + jsonRes);
+    private static void testSubmitCode(DataOutputStream dos, DataInputStream dis, String username, String email) {
         
-        long endTime = System.currentTimeMillis();
-        System.out.println("Time excute: " + (endTime - startTime) + "ms");
+        
+        
+        
+    }
+
+    private static void testSubmitPass(DataOutputStream dos, DataInputStream dis, String username, String email) {
+        
     }
 
 

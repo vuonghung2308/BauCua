@@ -12,8 +12,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.ChatMessage;
+import vn.vm.baucua.data.entity.RankRow;
 import vn.vm.baucua.data.entity.User;
-import vn.vm.baucua.data.request.CreateNewPassForgot;
 import vn.vm.baucua.data.request.ForgotPasswordRequest;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
@@ -350,20 +350,29 @@ public class Client {
             sendError(request, 1101, "Email không đúng, mời bạn nhập lại!");
             return ;
         }
+        User user = new User();
+        user.username = usernameRequest;
+        user.email = emailRequest;
+        this.user = user;
         String key = forgotUtil.genKey(usernameRequest);
         smtp.SMTP.sendMailToUser(emailRequest, key);
         sendSuccess(request);
     }
 
-    public void handleCreate(Request request) {
-        CreateNewPassForgot newPassForgot = (CreateNewPassForgot) request.getDataObject();
-        String username = newPassForgot.username;
-        String newPass = newPassForgot.newPass;
-        String key = newPassForgot.key;
-        int code = forgotUtil.checkKey(username, key);
+    public void handRank(Request request) { // chưa send
+        System.out.println("Client get rank");
+        List<RankRow> listuser = userDao.getRank();
+        System.out.println("Client get rank done");
+        sendSuccess(request, listuser);
+    }
+
+    void handleSubmitCode(Request request) {
+        String key = (String) request.getDataObject();
+        System.out.println(key);
+        System.out.println(this.user.username);
+        int code = forgotUtil.checkKey(this.user.username, key);
         if(code == 200){
             sendSuccess(request);
-            userDao.setPassword(username, newPass);
         }else{
             String message = "";
             if(code == 1200){
@@ -375,12 +384,12 @@ public class Client {
             }
             sendError(request, code, message);
         }
-        
     }
 
-    public void handRank(Request request) { // chưa send
-        List<User> listuser = userDao.getRank();
-        sendSuccess(request, listuser);
+    public void handleSubmitNewpass(Request request) {
+        String pass = (String) request.getDataObject();
+        userDao.setPassword(this.user.username, pass);
+        sendSuccess(request);
     }
 
 }

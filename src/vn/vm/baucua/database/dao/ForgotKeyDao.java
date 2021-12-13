@@ -57,7 +57,6 @@ public class ForgotKeyDao {
             statement.setString(2, (""+ System.currentTimeMillis()));
             statement.setString(3,username);
             int tmp = statement.executeUpdate();
-            System.out.println("-------------------------------------------------------so bản gi bi xóa:" + tmp);
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {

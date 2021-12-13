@@ -15,7 +15,7 @@ import vn.vm.baucua.util.ThreadUtils;
 
 public class App {
 
-    public static boolean debug = false;
+    public static boolean debug = true;
 
     public static void main(String[] args) throws IOException {
         Logger.getRootLogger().setLevel(Level.OFF);

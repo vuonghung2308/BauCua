@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import vn.vm.baucua.data.entity.RankRow;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.util.Log;
@@ -183,27 +184,33 @@ public class UserDao {
         }
     }
     
-    public List<User> getRank(){ // update ThanhND
-        String query = "SELECT * FROM player "
-                + "ORDER BY balance DESC limit 10";
+    public List<RankRow> getRank(){ // update ThanhND
+        String query = "SELECT `player`.`id`, `username`, `balance`, COUNT(`history`.`id`) AS `total`, SUM(if(`history`.`status` = 1, 1,0)) AS `win` " +
+"                        FROM `player` " +
+"                        LEFT JOIN `history` " +
+"                        ON `player`.`id` = `history`.`player_id` " +
+"                        GROUP BY `player`.`id` " +
+"                        ORDER BY `balance` DESC " +
+"                        LIMIT 10;";
         ConnectionPool pool = ConnectionPool.getInstance();
         Connection connection = null;
-        List<User> listUser = new ArrayList<>();
+        List<RankRow> listRank = new ArrayList<>();
         try {
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             ResultSet results = statement.executeQuery();
             while (results.next()) {
-                User user = new User();
-                user.id = results.getInt("id");
-                user.username = results.getString("username");
-                user.fullname = results.getString("full_name");
-                user.balance = results.getLong("balance");
-                user.email = results.getString("email");
-                listUser.add(user);
+                RankRow rankRow = new RankRow();
+                rankRow.id = results.getInt("id");
+                rankRow.username = results.getString("username");
+                rankRow.balance = results.getLong("balance");
+                rankRow.total = results.getInt("total");
+                rankRow.win_number = results.getInt("win");
+                listRank.add(rankRow);
+                System.out.println("add row");
             }
         } catch (SQLException | NullPointerException e) {
-            Log.e(e);
+            e.printStackTrace();
             throw new RuntimeException("Can't access to database");
         } finally {
             try {
@@ -214,6 +221,6 @@ public class UserDao {
                 Log.e(e);
             }
         }
-        return listUser;
+        return listRank;
     }
 }

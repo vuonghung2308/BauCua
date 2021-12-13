@@ -23,7 +23,6 @@ public class KeyForgotUtil {
     }
     
     public int checkKey(String username, String key){
-        if(dao.checkUser(username)){
             long currentTime = System.currentTimeMillis();
             long tmp = dao.checkKey(username, key);
             if(tmp == -1){
@@ -34,9 +33,6 @@ public class KeyForgotUtil {
                 return 200;
             }
             return 1200;
-        }
-        return 1202;
-        
     }
     public String genKey(String username){
         System.out.println("---------------------------------------------------------gen key");

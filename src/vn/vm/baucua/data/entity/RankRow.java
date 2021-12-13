@@ -3,14 +3,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package vn.vm.baucua.data.request;
+package vn.vm.baucua.data.entity;
 
 /**
  *
  * @author User
  */
-public class CreateNewPassForgot {
+public class RankRow {
+    public int id;
     public String username;
-    public String newPass;
-    public String key;
+    public long balance;
+    public int win_number;
+    public int total;
 }
