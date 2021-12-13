@@ -114,6 +114,9 @@ public class ThreadSocket extends Thread {
                     client.handleBat(request);
                     break;
                 }
+                case "info":
+                    client.sendPersonalInfo();
+                    break;
                 case "ping": {
                     break;
                 }

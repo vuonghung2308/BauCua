@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+import vn.vm.baucua.data.entity.PersonalInfo;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.socket.Client;
 
@@ -53,7 +54,6 @@ public class ClientPool {
                 client -> client.notInRoom())
                 .collect(Collectors.toList());
     }
-
     public static ClientPool getInstance() {
         if (pool == null) {
             pool = new ClientPool();

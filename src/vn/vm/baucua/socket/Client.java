@@ -13,6 +13,7 @@ import java.util.TimerTask;
 import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.entity.RankRow;
+import vn.vm.baucua.data.entity.PersonalInfo;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.data.request.ForgotPasswordRequest;
 import vn.vm.baucua.data.request.GoRoomRequest;
@@ -337,7 +338,10 @@ public class Client {
     public boolean notInRoom() {
         return room == null;
     }
-
+    public void sendPersonalInfo(){
+        PersonalInfo p = userDao.getPersonalinfo(getId());
+        send(new Response("info", p, 200));
+    }
     public void handleForgot(Request request) {
         ForgotPasswordRequest forgotPasswordRequest = (ForgotPasswordRequest) request.getDataObject();
         String usernameRequest = forgotPasswordRequest.username;
@@ -391,5 +395,4 @@ public class Client {
         userDao.setPassword(this.user.username, pass);
         sendSuccess(request);
     }
-
 }

@@ -8,7 +8,6 @@ package vn.vm.baucua.util;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
-import javafx.util.Pair;
 import vn.vm.baucua.database.dao.ForgotKeyDao;
 /**
  *
