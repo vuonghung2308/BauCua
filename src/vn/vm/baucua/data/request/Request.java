@@ -32,6 +32,12 @@ public class Request {
                 return dataFromJson(ChatMessage.class);
             case "bet":
                 return dataFromJson(Bet.class);
+            case "forgot_password":
+                return dataFromJson(ForgotPasswordRequest.class);
+            case "submit_code":
+                return data;
+            case "submit_pass":
+                return data;
         }
         return null;
     }
@@ -46,5 +52,17 @@ public class Request {
 
     public boolean isRegisterRequest() {
         return content.equals("register");
+    }
+
+    public boolean isForgotPassword() {
+        return content.equals("forgot_password");
+    }
+
+    public boolean isSubmitCode() {
+        return content.equals("submit_code");
+    }
+
+    public boolean isSubmitNewPassword() {
+        return content.equals("submit_pass");
     }
 }

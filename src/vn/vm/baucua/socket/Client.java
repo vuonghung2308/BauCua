@@ -7,11 +7,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.ChatMessage;
+import vn.vm.baucua.data.entity.RankRow;
+import vn.vm.baucua.data.entity.PersonalInfo;
 import vn.vm.baucua.data.entity.User;
+import vn.vm.baucua.data.request.ForgotPasswordRequest;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
 import vn.vm.baucua.data.request.RegisterRequest;
@@ -20,6 +24,7 @@ import vn.vm.baucua.data.response.Response;
 import vn.vm.baucua.database.dao.UserDao;
 import vn.vm.baucua.socket.pool.ClientPool;
 import vn.vm.baucua.socket.pool.RoomPool;
+import vn.vm.baucua.util.KeyForgotUtil;
 import vn.vm.baucua.util.StroUtils;
 import vn.vm.baucua.util.Log;
 import vn.vm.baucua.util.ThreadUtils;
@@ -37,6 +42,7 @@ public class Client {
     private Timer timer;
     private Room room;
     private User user;
+    private KeyForgotUtil forgotUtil;
 
     public Client(Socket socket) {
         this.socket = socket;
@@ -62,6 +68,7 @@ public class Client {
         dis = new DataInputStream(is);
         dos = new DataOutputStream(os);
         userDao = new UserDao();
+        forgotUtil = new KeyForgotUtil();
     }
 
     public void closeSocket() throws IOException {
@@ -144,7 +151,8 @@ public class Client {
         String username = register.username;
         String password = register.password;
         String fullName = register.fullname;
-        if (userDao.insertUser(username, password, fullName)) {
+        String email = register.email;
+        if (userDao.insertUser(username, password, fullName, email)) {
             sendSuccess(request);
         } else {
             sendError(request, 500, "Tên tài khoản đã tồn tại,"
@@ -329,5 +337,62 @@ public class Client {
 
     public boolean notInRoom() {
         return room == null;
+    }
+    public void sendPersonalInfo(){
+        PersonalInfo p = userDao.getPersonalinfo(getId());
+        send(new Response("info", p, 200));
+    }
+    public void handleForgot(Request request) {
+        ForgotPasswordRequest forgotPasswordRequest = (ForgotPasswordRequest) request.getDataObject();
+        String usernameRequest = forgotPasswordRequest.username;
+        String emailRequest = forgotPasswordRequest.email;
+        if(!userDao.userExists(usernameRequest)){
+            sendError(request, 1100, "Tài khoản không tồn tại, mời bạn nhập lại!");
+            return ;
+        }
+        if(!userDao.getEmail(usernameRequest).equals(emailRequest)){
+            sendError(request, 1101, "Email không đúng, mời bạn nhập lại!");
+            return ;
+        }
+        User user = new User();
+        user.username = usernameRequest;
+        user.email = emailRequest;
+        this.user = user;
+        String key = forgotUtil.genKey(usernameRequest);
+        smtp.SMTP.sendMailToUser(emailRequest, key);
+        sendSuccess(request);
+    }
+
+    public void handRank(Request request) { // chưa send
+        System.out.println("Client get rank");
+        List<RankRow> listuser = userDao.getRank();
+        System.out.println("Client get rank done");
+        sendSuccess(request, listuser);
+    }
+
+    void handleSubmitCode(Request request) {
+        String key = (String) request.getDataObject();
+        System.out.println(key);
+        System.out.println(this.user.username);
+        int code = forgotUtil.checkKey(this.user.username, key);
+        if(code == 200){
+            sendSuccess(request);
+        }else{
+            String message = "";
+            if(code == 1200){
+                message = "Mã xác nhận đã mất hiệu lực, vui lòng tạo lại mã khác!";
+            }else if(code == 1201){
+                message = "Mã xác nhận chưa chính xác, vui lòng nhập lại!";
+            }else if(code == 1202){
+                message = "Bạn chưa sử dụng chức năng quên mật khẩu, vui lòng thử lại!";
+            }
+            sendError(request, code, message);
+        }
+    }
+
+    public void handleSubmitNewpass(Request request) {
+        String pass = (String) request.getDataObject();
+        userDao.setPassword(this.user.username, pass);
+        sendSuccess(request);
     }
 }
