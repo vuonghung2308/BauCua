@@ -8,8 +8,8 @@ public class DatabaseConfig {
     public static final String LOCAL_HOST = "localhost";
     public static final String DB_NAME = "baucua";
     public static final String DB_PORT = "3306";
-    public static final String USER_NAME = App.debug ? "admin" : "root";
-    public static final String PASSWORD = App.debug ? "admin@1234" : "123456789";
+    public static final String USER_NAME = App.debug ? "admin" : "admin";
+    public static final String PASSWORD = App.debug ? "admin@1234" : "admin@1234";
     public static final String DB_DRIVER = "com.mysql.cj.jdbc.Driver";
     public static final int DB_MIN_CONNECTIONS = 2;
     public static final int DB_MAX_CONNECTIONS = 5;
