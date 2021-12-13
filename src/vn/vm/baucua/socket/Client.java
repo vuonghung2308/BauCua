@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.stream.Stream;
 import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.ChatMessage;
 import vn.vm.baucua.data.entity.User;
@@ -120,7 +119,7 @@ public class Client {
 
     public boolean handleLoginRequest(Request request) throws IOException {
         LoginRequest data = (LoginRequest) request.getDataObject();
-        User newUser = userDao.getUser(data.username, data.password);
+        User newUser = userDao.getUser(data.username, data.password, data.email);
         if (newUser != null) {
             Client c = clientPool.getClient(newUser.id);
             if (c != null) {

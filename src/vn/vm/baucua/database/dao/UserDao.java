@@ -10,9 +10,16 @@ import vn.vm.baucua.util.Log;
 
 public class UserDao {
 
-    public User getUser(String username, String password) {
+    public User getUser(String username, String password, String email) {
+        if (username == null) {
+            username = "";
+        }
+        if (email == null) {
+            email = "";
+        }
         String query = "SELECT * FROM player "
-                + "WHERE `username` = ? AND `password` = SHA2(?,224) limit 1";
+                + "WHERE (`username` = ? OR `email` = ?) "
+                + "AND `password` = SHA2(?,224) limit 1";
         ConnectionPool pool = ConnectionPool.getInstance();
         Connection connection = null;
         User user = null;
@@ -20,7 +27,8 @@ public class UserDao {
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, username);
-            statement.setString(2, password);
+            statement.setString(2, email);
+            statement.setString(3, password);
             ResultSet results = statement.executeQuery();
             if (results.next()) {
                 user = new User();
@@ -76,8 +84,8 @@ public class UserDao {
             int rowInserted = 0;
             ConnectionPool pool = ConnectionPool.getInstance();
             Connection connection = null;
-            String sql = "INSERT INTO player(`username`, `password`, `full_name`, `balance`)"
-                    + "VALUE(?,SHA2(?,224),?,?)";
+            String sql = "INSERT INTO player(`username`, `password`, "
+                    + "`full_name`, `balance`) VALUE(?,SHA2(?,224),?,?)";
             try {
                 connection = pool.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);

@@ -70,7 +70,8 @@ public class Client1 {
     ) throws IOException {
         long startTime = System.currentTimeMillis();
         LoginRequest data = new LoginRequest();
-        data.username = username;
+//        data.username = username;
+        data.email ="vuonghung2308@gmail.com";
         data.password = password;
         Request request = new Request();
         request.content = "login";
