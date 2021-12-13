@@ -12,6 +12,7 @@ import java.util.TimerTask;
 import java.util.stream.Stream;
 import vn.vm.baucua.data.entity.Bet;
 import vn.vm.baucua.data.entity.ChatMessage;
+import vn.vm.baucua.data.entity.PersonalInfo;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.data.request.GoRoomRequest;
 import vn.vm.baucua.data.request.LoginRequest;
@@ -330,5 +331,9 @@ public class Client {
 
     public boolean notInRoom() {
         return room == null;
+    }
+    public void sendPersonalInfo(){
+        PersonalInfo p = userDao.getPersonalinfo(getId());
+        send(new Response("info", p, 200));
     }
 }

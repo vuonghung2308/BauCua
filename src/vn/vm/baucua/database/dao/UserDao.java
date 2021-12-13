@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import vn.vm.baucua.data.entity.PersonalInfo;
 import vn.vm.baucua.data.entity.User;
 import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.util.Log;
@@ -103,7 +104,105 @@ public class UserDao {
             return false;
         }
     }
-
+    public PersonalInfo getPersonalinfo(int id){
+        System.out.println(id);
+        ConnectionPool pool = ConnectionPool.getInstance();
+        Connection connection = null;
+        PersonalInfo p = new PersonalInfo();
+        try {
+            String sql = "SELECT count(id) FROM baucua.history where `player_id` = ?";
+            connection = pool.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            ResultSet res = statement.executeQuery();
+            
+            if (res.next()) {
+                p.total = res.getLong("count(id)");
+            }
+        } catch (SQLException ex) {
+            Log.e(ex);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Log.e(e);
+            }
+        }
+        try {
+            String sql = "SELECT count(id) FROM baucua.history "
+                + "WHERE `status` = ? AND `player_id` = ?";
+            connection = pool.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, 0);
+            statement.setInt(2, id);
+            ResultSet res = statement.executeQuery();
+            
+            if (res.next()) {
+                p.lose_number = res.getLong("count(id)");
+            }
+        } catch (SQLException ex) {
+            Log.e(ex);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Log.e(e);
+            }
+        }
+        try {
+            String sql = "SELECT count(id) FROM baucua.history "
+                + "WHERE `status` = ? AND `player_id` = ?";
+            connection = pool.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, 1);
+            statement.setInt(2, id);
+            ResultSet res = statement.executeQuery();
+            
+            if (res.next()) {
+                p.win_number = res.getLong("count(id)");
+            }
+        } catch (SQLException ex) {
+            Log.e(ex);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Log.e(e);
+            }
+        }
+        try {
+            String sql = "SELECT * FROM baucua.player "
+                + "WHERE `id` = ?";
+            connection = pool.getConnection();
+            PreparedStatement statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            ResultSet res = statement.executeQuery();
+            
+            if (res.next()) {
+                p.email = res.getString("email");
+                p.balance = res.getLong("balance");
+                p.fullname = res.getString("full_name");
+                p.username = res.getString("username");
+            }
+        } catch (SQLException ex) {
+            Log.e(ex);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                Log.e(e);
+            }
+        }
+        return p;
+    }
     public void setBalance(int id, long balance) {
         String sql = "UPDATE player SET `balance` = ? "
                 + "WHERE `id` = ?";
