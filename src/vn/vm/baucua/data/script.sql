@@ -88,7 +88,7 @@ CREATE TABLE `player` (
 --
 -- Dumping data for table `player`
 --
-
+-- Pass username + @1234
 LOCK TABLES `player` WRITE;
 /*!40000 ALTER TABLE `player` DISABLE KEYS */;
 INSERT INTO `player` VALUES (1,'manhhung','6f39852bb421cf268297f8237ceae66405a853ab357a46a49b82e8fe','Vương Mạnh Hùng',200000,'vuonghung2308@gmail.com'),(2,'ductoan','20e23de0a295e3cbd095d908bc891d04eaafb1a39aebda85fe77363e','Nguyễn Đức Toán',150000,'toankt2k@gmail.com'),(3,'vanquyet','0d003db898d86bb55fc4bab3136706ad19140db03d5d20ef1032e1d3','Nguyễn Văn Quyết',150000,'quyetkaito@gmail.com'),(4,'thanhngo','ac06727a752c6aff8d30f7f8bd387e50ef8955313f169c7bacdb020b','Nguyễn Đình Thành',150000,'mutrangaoden@gmail.com'),(5,'khanhdinh','a28c4fdb3ff2dbd43710128f751f0ee6d5c23bbf98718f818809e8fe','Đinh Văn Khánh',150000,'dinhvankhanh102@gmail.com');

@@ -14,12 +14,9 @@ import vn.vm.baucua.util.Log;
 
 public class UserDao {
 
-    public User getUser(String username, String password, String email) {
+    public User getUser(String username, String password) {
         if (username == null) {
             username = "";
-        }
-        if (email == null) {
-            email = "";
         }
         String query = "SELECT * FROM player "
                 + "WHERE (`username` = ? OR `email` = ?) "
@@ -31,7 +28,7 @@ public class UserDao {
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(query);
             statement.setString(1, username);
-            statement.setString(2, email);
+            statement.setString(2, username);
             statement.setString(3, password);
             ResultSet results = statement.executeQuery();
             if (results.next()) {
@@ -316,7 +313,6 @@ public class UserDao {
                 rankRow.total = results.getInt("total");
                 rankRow.win_number = results.getInt("win");
                 listRank.add(rankRow);
-                System.out.println("add row");
             }
         } catch (SQLException | NullPointerException e) {
             e.printStackTrace();

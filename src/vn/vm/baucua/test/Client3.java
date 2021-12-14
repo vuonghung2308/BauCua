@@ -36,9 +36,9 @@ public class Client3 {
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "thanhngo";
+        String username = "manhhung";
         String password = username + "@1234";
-        String email = "mutrangaoden@gmail.com";
+        String email = "vuonghung2308@gmail.com";
         String newPass = "123456";
         String key = "425976";
 
@@ -50,11 +50,11 @@ public class Client3 {
             System.out.println("Connected to ip: " + host + ", port: " + port);
 //
 //
-            if (!testLogin(dos, dis, username, "thanh123456")) {
-                return;
-            }
-                
-//            testForgotpass(dos, dis, username, email);
+//            if (!testLogin(dos, dis, username, "thanh123456")) {
+//                return;
+//            }
+//                
+            testForgotpass(dos, dis, username, email);
 //            testRank(dos, dis);
 //            testCreateNewPass(dos, dis, username, newPass, key);
 //            testSubmitCode(dos, dis, username, email);

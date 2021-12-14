@@ -126,7 +126,7 @@ public class Client {
 
     public boolean handleLoginRequest(Request request) throws IOException {
         LoginRequest data = (LoginRequest) request.getDataObject();
-        User newUser = userDao.getUser(data.username, data.password, data.email);
+        User newUser = userDao.getUser(data.username, data.password);
         if (newUser != null) {
             Client c = clientPool.getClient(newUser.id);
             if (c != null) {
@@ -359,14 +359,12 @@ public class Client {
         user.email = emailRequest;
         this.user = user;
         String key = forgotUtil.genKey(usernameRequest);
-        smtp.SMTP.sendMailToUser(emailRequest, key);
+        vn.vm.baucua.util.SMTPUtils.sendMailToUser(emailRequest, key);
         sendSuccess(request);
     }
 
     public void handRank(Request request) { // chưa send
-        System.out.println("Client get rank");
         List<RankRow> listuser = userDao.getRank();
-        System.out.println("Client get rank done");
         sendSuccess(request, listuser);
     }
 
