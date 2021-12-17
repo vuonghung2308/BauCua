@@ -1,6 +1,8 @@
 package vn.vm.baucua.game;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import vn.vm.baucua.data.entity.Result;
 import vn.vm.baucua.data.entity.Bet;
 import java.util.HashMap;
@@ -110,6 +112,7 @@ public class Game {
 
     public void play() {
         int[] res = makeResult();
+        Date now = Calendar.getInstance().getTime();
         result = new Result(res);
         players.forEach((id, player) -> {
             long difference = getDifference(
@@ -117,7 +120,11 @@ public class Game {
             );
             player.difference = difference;
             player.balance += difference;
-            userDao.setBalance(id, player.balance);
+            int status = difference > 0 ? 1 : difference == 0 ? 0 : -1;
+            userDao.setBalance(
+                    id, player.balance,
+                    status, difference, now
+            );
         });
     }
 

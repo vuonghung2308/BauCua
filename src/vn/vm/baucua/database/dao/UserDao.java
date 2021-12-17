@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import vn.vm.baucua.data.entity.PersonalInfo;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import vn.vm.baucua.data.entity.RankRow;
 import vn.vm.baucua.data.entity.User;
@@ -13,6 +14,8 @@ import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.util.Log;
 
 public class UserDao {
+
+    private HistoryDao historyDao;
 
     public User getUser(String username, String password) {
         if (username == null) {
@@ -88,6 +91,7 @@ public class UserDao {
             Connection connection = null;
             String sql = "INSERT INTO player(`username`, `password`, `full_name`, `balance`, `email`)"
                     + "VALUE(?,SHA2(?,224),?,?,?)";
+
             try {
                 connection = pool.getConnection();
                 PreparedStatement statement = connection.prepareStatement(sql);
@@ -146,7 +150,7 @@ public class UserDao {
                     + "WHERE `status` = ? AND `player_id` = ?";
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, 0);
+            statement.setInt(1, -1);
             statement.setInt(2, id);
             ResultSet res = statement.executeQuery();
 
@@ -215,7 +219,12 @@ public class UserDao {
         return p;
     }
 
-    public void setBalance(int id, long balance) {
+    public void setBalance(
+            int id, long balance, int status,
+            long difference, Date now) {
+        if (historyDao == null) {
+            historyDao = new HistoryDao();
+        }
         String sql = "UPDATE player SET `balance` = ? "
                 + "WHERE `id` = ?";
         ConnectionPool pool = ConnectionPool.getInstance();
@@ -226,6 +235,10 @@ public class UserDao {
             statement.setLong(1, balance);
             statement.setLong(2, id);
             statement.executeUpdate();
+            historyDao.insertHistory(
+                    id, status,
+                    difference, now
+            );
         } catch (SQLException e) {
             Log.e(e);
         } finally {
@@ -243,7 +256,6 @@ public class UserDao {
         String sql = "SELECT * FROM player WHERE `username` = ? limit 1";
         ConnectionPool pool = ConnectionPool.getInstance();
         Connection connection = null;
-        boolean userExists = false;
         try {
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);

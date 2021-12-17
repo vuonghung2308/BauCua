@@ -35,23 +35,18 @@ public class SMTPUtils {
         session.setDebug(false);
 
         try {
-            // Create a default MimeMessage object.
             MimeMessage message = new MimeMessage(session);
 
-            // Set From: header field of the header.
             message.setFrom(new InternetAddress(MAIL_FROME));
 
-            // Set To: header field of the header.
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(email));
 
-            // Set Subject: header field
+            String mess = "Mã xác nhận của bạn là: " + key
+                    + ". Mã xác nhận của bạn sẽ có hiệu lực trong 5 phút";
+
+            message.setText(mess);
             message.setSubject(SUBJECT);
 
-            String mess = "Mã xác nhận của bạn là: " + key + ". Mã xác nhận của bạn sẽ có hiệu lực trong 5 phút";
-            // Now set the actual message
-            message.setText(mess);
-
-            // Send message
             Transport.send(message);
         } catch (MessagingException mex) {
             System.out.println(mex.getMessage());

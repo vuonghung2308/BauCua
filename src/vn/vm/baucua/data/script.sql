@@ -51,9 +51,9 @@ CREATE TABLE `history` (
   `player_id` int unsigned DEFAULT NULL,
   `time` datetime NOT NULL,
   `status` int NOT NULL,
-  `diffirence` int unsigned NOT NULL,
+  `difference` int NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -62,7 +62,7 @@ CREATE TABLE `history` (
 
 LOCK TABLES `history` WRITE;
 /*!40000 ALTER TABLE `history` DISABLE KEYS */;
-INSERT INTO `history` VALUES (1,1,'2021-11-09 00:00:00',1,0),(2,1,'2021-11-09 00:00:00',1,0),(3,1,'2021-11-09 00:00:00',1,0),(4,1,'2021-11-09 00:00:00',1,0),(5,1,'2021-11-09 00:00:00',1,0),(6,1,'2021-11-09 00:00:00',1,0),(7,1,'2021-11-09 00:00:00',0,0),(8,1,'2021-11-09 00:00:00',0,0),(9,1,'2021-11-09 00:00:00',0,0),(10,1,'2021-11-09 00:00:00',0,0),(11,1,'2021-11-09 00:00:00',-1,0),(12,1,'2021-11-09 00:00:00',-1,0),(13,1,'2021-11-09 00:00:00',-1,0),(14,1,'2021-11-09 00:00:00',-1,0);
+INSERT INTO `history` VALUES (1,1,'2021-11-09 00:00:00',1,0),(2,1,'2021-11-09 00:00:00',1,0),(3,1,'2021-11-09 00:00:00',1,0),(4,1,'2021-11-09 00:00:00',1,0),(5,1,'2021-11-09 00:00:00',1,0),(6,1,'2021-11-09 00:00:00',1,0),(7,1,'2021-11-09 00:00:00',0,0),(8,1,'2021-11-09 00:00:00',0,0),(9,1,'2021-11-09 00:00:00',0,0),(10,1,'2021-11-09 00:00:00',0,0),(11,1,'2021-11-09 00:00:00',-1,0),(12,1,'2021-11-09 00:00:00',-1,0),(13,1,'2021-11-09 00:00:00',-1,0),(14,1,'2021-11-09 00:00:00',-1,0),(15,2,'2021-12-14 03:29:21',1,60000);
 /*!40000 ALTER TABLE `history` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -88,10 +88,10 @@ CREATE TABLE `player` (
 --
 -- Dumping data for table `player`
 --
--- Pass username + @1234
+
 LOCK TABLES `player` WRITE;
 /*!40000 ALTER TABLE `player` DISABLE KEYS */;
-INSERT INTO `player` VALUES (1,'manhhung','6f39852bb421cf268297f8237ceae66405a853ab357a46a49b82e8fe','Vương Mạnh Hùng',200000,'vuonghung2308@gmail.com'),(2,'ductoan','20e23de0a295e3cbd095d908bc891d04eaafb1a39aebda85fe77363e','Nguyễn Đức Toán',150000,'toankt2k@gmail.com'),(3,'vanquyet','0d003db898d86bb55fc4bab3136706ad19140db03d5d20ef1032e1d3','Nguyễn Văn Quyết',150000,'quyetkaito@gmail.com'),(4,'thanhngo','ac06727a752c6aff8d30f7f8bd387e50ef8955313f169c7bacdb020b','Nguyễn Đình Thành',150000,'mutrangaoden@gmail.com'),(5,'khanhdinh','a28c4fdb3ff2dbd43710128f751f0ee6d5c23bbf98718f818809e8fe','Đinh Văn Khánh',150000,'dinhvankhanh102@gmail.com');
+INSERT INTO `player` VALUES (1,'manhhung','6f39852bb421cf268297f8237ceae66405a853ab357a46a49b82e8fe','Hùng',200000,'vuonghung2308@gmail.com'),(2,'ductoan','20e23de0a295e3cbd095d908bc891d04eaafb1a39aebda85fe77363e','Toán',450000,'toankt2k@gmail.com'),(3,'vanquyet','0d003db898d86bb55fc4bab3136706ad19140db03d5d20ef1032e1d3','Quyết',150000,'quyetkaito@gmail.com'),(4,'thanhngo','ac06727a752c6aff8d30f7f8bd387e50ef8955313f169c7bacdb020b','Thành',150000,'mutrangaoden@gmail.com'),(5,'khanhdinh','a28c4fdb3ff2dbd43710128f751f0ee6d5c23bbf98718f818809e8fe','Khánh',150000,'dinhvankhanh102@gmail.com');
 /*!40000 ALTER TABLE `player` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -104,4 +104,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2021-12-13 22:37:34
+-- Dump completed on 2021-12-14 22:30:24

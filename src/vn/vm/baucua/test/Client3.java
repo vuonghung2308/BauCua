@@ -30,15 +30,15 @@ import vn.vm.baucua.util.StroUtils;
  */
 public class Client3 {
     public static void main(String[] args) throws IOException, InterruptedException {
-        boolean serverTest = false;
+        boolean serverTest = true;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;
         Integer port = 1111;
 
-        String username = "manhhung";
+        String username = "ductoan";
         String password = username + "@1234";
-        String email = "vuonghung2308@gmail.com";
+        String email = "toankt2k@gmail.com";
         String newPass = "123456";
         String key = "425976";
 

@@ -1,35 +1,30 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package vn.vm.baucua.database.dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import vn.vm.baucua.database.ConnectionPool;
 import vn.vm.baucua.util.Log;
 
-/**
- *
- * @author dinhv
- */
-public class HistoryPlayDAO {
-    public boolean insertHistory(int playerID, int status, long different,String time ) {
-       
+public class HistoryDao {
+
+    public boolean insertHistory(int id, int status, long difference, Date time) {
+
         int rowInserted = 0;
         ConnectionPool pool = ConnectionPool.getInstance();
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
         Connection connection = null;
-        String sql = "INSERT INTO history_play(`player_id`, `status`, `time`, `different`)"
-                + "VALUE(?,SHA2(?,224),?,?)";
+        String sql = "INSERT INTO history(`player_id`, `status`, `time`, `difference`)"
+                + "VALUE(?,?,?,?)";
         try {
             connection = pool.getConnection();
             PreparedStatement statement = connection.prepareStatement(sql);
-            statement.setInt(1, playerID);
+            statement.setInt(1, id);
             statement.setInt(2, status);
-            statement.setLong(3, different);
-            statement.setString(4, time);
+            statement.setString(3, format.format(time));
+            statement.setLong(4, difference);
             rowInserted = statement.executeUpdate();
 
         } catch (SQLException ex) {
@@ -44,6 +39,6 @@ public class HistoryPlayDAO {
             }
         }
         return rowInserted > 0;
-        
+
     }
 }
