@@ -16,7 +16,7 @@ import vn.vm.baucua.util.StroUtils;
 public class Client1 {
 
     public static void main(String[] args) throws IOException {
-        boolean serverTest = true;
+        boolean serverTest = false;
         String server_ip = "40.90.172.165";
         String localhost = "localhost";
         String host = serverTest ? server_ip : localhost;

@@ -46,7 +46,7 @@ public class ConnectionPool {
 
     public Connection getConnection() {
         try {
-            Connection con= boneCP.getConnection();
+            Connection con = boneCP.getConnection();
             con.setAutoCommit(true);
             return con;
         } catch (SQLException e) {

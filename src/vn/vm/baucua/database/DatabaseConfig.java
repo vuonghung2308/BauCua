@@ -4,7 +4,7 @@ import vn.vm.baucua.App;
 
 public class DatabaseConfig {
 
-    public static final String SERVER_IP = "40.90.172.165";
+    public static final String SERVER_IP = "116.104.201.212";
     public static final String LOCAL_HOST = "localhost";
     public static final String DB_NAME = "baucua";
     public static final String DB_PORT = "3306";
